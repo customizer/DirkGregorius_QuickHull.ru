@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html><head>
 <title>DirkGregorius_ImplementingQuickHull</title>
 <meta http-equiv="content-type" content="text/html; charset=utf-8">
@@ -7,7 +7,7 @@
 </head>
 <body>
 <a href="https://www.gamedev.net/profile/30524-dirk-gregorius/?tab=activity"><img src="img/Dirk_Gregorius.png" width=150 border=0 align="left" alt="Dirk Gregorius" style="margin-top:-20px;"></a>
-<div style="color:#000080; margin-left:220px;">Dirk Gregorius</div></a>
+<div style="color:#000080; margin-left:220px;"><a href="https://www.gamedev.net/profile/30524-dirk-gregorius/?tab=activity">Dirk Gregorius</a></div>
 
 <h1 style="margin-top:20px; margin-left:200px; margin-bottom:40px;">Реализация быстрого алгоритма выпуклой оболочки<br>
 <span style="font-size:70%; margin-left:20px;">Implementing&nbsp;QuickHull</span></h1><br><br>
@@ -23,7 +23,7 @@
 
 <h2>План лекции</h2>
 Вначале хотелось бы быстро изложить план лекции:
-<div class=blockindent>&nbsp; &#9679; &nbsp; После короткого вступления сначала будет разговор о выпуклой оболочке (Quickhull) в двумерном пространстве.</div>
+<div class=blockindent>&nbsp; &#9679; &nbsp; После короткого вступления сначала будет разговор об алгоритме выпуклой оболочки (Quickhull) в двумерном пространстве.</div>
 <div class=blockindent>&nbsp; &#9679; &nbsp; Затем продолжим описание с геометрическими постоянными (инвариантами), которые нужно поддерживать при построении оболочки, во избежание вычислительных проблем. Then we continue with geometrical invariants which we need to maintain while constructing the hull to avoid numerical problems</div>
 <div class=blockindent>&nbsp; &#9679; &nbsp; После знакомства с двумерным вариантом, тут же погружаемся в трехмерную версию быстрой оболочки.</div>
 <div class=blockindent>&nbsp; &#9679; &nbsp; Затем исследуем геометрические и топологические инварианты при построении оболочки в трехмерном пространстве и
@@ -38,25 +38,22 @@ We then investigate geometrical and topological invariants while constructing th
 
 <h3>Выпуклые оболочки</h3>
 Что такое выпуклая оболочка (convex hull)?<br>
-Задав набор из N входный точек можно определить, что можно называть выпуклой оболочкой:
-<div class=blockindent>&nbsp; &#9679; &nbsp; Официально: выпуклая оболочка это наименьший выпуклый набор, содержащий все входные точки.</div>
-<div class=blockindent>&nbsp; &#9679; &nbsp; По простому: Если все точки представить в виде гвоздей, вбитых в деревянную дощечку, то выпуклая оболочка будет резинкой, обернутой вокруг внешних гвоздей.</div>
+Задав набор из энного числа входных точек можно определить, что можно называть выпуклой оболочкой:
+<div class=blockindent>&nbsp; &#9679; &nbsp; Официальное определение: выпуклая оболочка это наименьший выпуклый набор, содержащий все входные точки.</div>
+<div class=blockindent>&nbsp; &#9679; &nbsp; По простому: Если все точки представить в виде гвоздей, вбитых в деревянную дощечку, то выпуклая оболочка будет резинкой, натянутой вокруг внешних гвоздей.</div>
 <div class="caption"><img src="img/2.png" width=250><br>Набор точек в двумерном пространстве и его выпуклая оболочка</div><br>
 <b>Это означает, что в двумерном пространстве оболочкой является многоугольник (полигон), определяемый вершинами и ребрами!</b><br><br>
 
 Также хочется показать трехмерную выпуклую оболочку вокруг хорошо известного объекта - чайника Юта (Utah Teapot).
 <div class=blockindent>&nbsp; &#9679; &nbsp; В двумерном пространстве для получения некоего понимания о выпуклой оболочке в качестве аналога использовалось кольцо резинки.</div>
-<div class=blockindent>&nbsp; &#9679; &nbsp; В трехмерном пространстве можно задуматься об усадочной упаковке объекта. In 3D you can think of shrink wrapping the object</div>
+<div class=blockindent>&nbsp; &#9679; &nbsp; В трехмерном пространстве выпуклую оболочку можно рассматривать как упаковку объекта плотно обтягивающей пленкой.</div>
 <div class="caption"><img src="img/3.png" width=600></div><br>
 <b>В трехмерном пространстве оболочкой является многогранник, определяемый вершинами, ребрами и многоугольными (полигональными) гранями! Обратите внимание, что мы не собираемся ограничиваться только треугольными гранями!</b><br><br>
 
 <h4>Использование выпуклых оболочек для обнаружения столкновений</h4>
 Почему следует использовать выпуклые оболочки для обнаружения столкновений в играх?
-Why should we use convex hulls for collision detection in games?
-<div class=blockindent>&nbsp; &#9679; &nbsp; Динамические объекты в играх используют приближение к простым формам для обнаружения столкновений поскольку использование отображения геометрии <b>не будет</b> эффективным.
-Dynamic game objects are usually approximated by simpler shapes for collision detection since  using the render geometry would NOT be efficient</div>
-<div class=blockindent>&nbsp; &#9679; &nbsp; Выпуклые оболочки - хороший кандидат поскольку он могут достаточно хорошо соответствовать даже сложному геометрическому элементу.
-Convex hulls are a good candidate since they can approximate even complex geometry quite well</div>
+<div class=blockindent>&nbsp; &#9679; &nbsp; Динамические объекты в играх используют приближение к простым формам для обнаружения столкновений поскольку использование отображения геометрического элемента <b>не будет</b> эффективным с точки зрения производительности.</div>
+<div class=blockindent>&nbsp; &#9679; &nbsp; Выпуклые оболочки - хороший кандидат на замену, поскольку они могут достаточно хорошо соответствовать даже сложному геометрическому элементу.</div>
 <div class=blockindent>&nbsp; &#9679; &nbsp; Кроме того, обнаружение столкновений для выпуклых многогранников хорошо и надежно определяется. Вспомните о <a href="https://ru.wikipedia.org/wiki/%D0%90%D0%BB%D0%B3%D0%BE%D1%80%D0%B8%D1%82%D0%BC_%D0%93%D0%B8%D0%BB%D0%B1%D0%B5%D1%80%D1%82%D0%B0_%E2%80%94_%D0%94%D0%B6%D0%BE%D0%BD%D1%81%D0%BE%D0%BD%D0%B0_%E2%80%94_%D0%9A%D1%91%D1%80%D1%82%D0%B8" onmouseover="show('GJK - сокращ. от англ. слов Gilbert—Johnson—Keerthi algorithm<br>(алгоритм Гилберта—Джонсона—Кёрти) — алгоритм для<br>определения минимального расстояния между двумя<br>выпуклыми множествами (объектами)')" onmouseout="hide()">GJK</a> и
 <a href="https://ru.wikipedia.org/wiki/%D0%A2%D0%B5%D0%BE%D1%80%D0%B5%D0%BC%D0%B0_%D0%BE%D0%B1_%D0%BE%D0%BF%D0%BE%D1%80%D0%BD%D0%BE%D0%B9_%D0%B3%D0%B8%D0%BF%D0%B5%D1%80%D0%BF%D0%BB%D0%BE%D1%81%D0%BA%D0%BE%D1%81%D1%82%D0%B8" onmouseover="show('SAT - сокращ. от англ. слов Separating Axis Theorem<br>(теорема разделяющей оси) для двух выпуклых объектов<br>можно сформулировать так: два выпуклых объекта<br>пересекаются тогда и только тогда, когда существует<br>плоскость (для двумерного случая - прямая), такая,<br>что одна геометрия лежит по одну её сторону, а другая<br>- по другую')" onmouseout="hide()">SAT</a>, которые мы обсуждали уже здесь в предыдущих руководствах.
 <!-- http://www.dyn4j.org/2010/01/sat/ --></div><br>
@@ -68,39 +65,27 @@ Convex hulls are a good candidate since they can approximate even complex geomet
 <div class=blockindent>&nbsp; &#9679; &nbsp; Показать, как физический движок рассматривает игру.</div>
 
 Sergiy will show you how to implement awesome physics visualization right after this talk!<br><br>
-
-I hope the videos gave you an idea about the problem we are trying to solve here today.<br><br>
-
+Надеюсь что видеоролики дали общее представление проблемы, которую мы попытаемся здесь решить.<br><br>
 
 
-When I started looking in convex hulls I quickly came across an algorithm called Quickhull:
+Когда я начал присматриваться к построению выпуклых оболочек, то быстро наткнулся на алгоритм под названием Quickhull:
+<div class=blockindent>&nbsp; &#9679; &nbsp; Quickhull был выпущен в 1995 году Barber и Dobkin.</div>
+<div class=blockindent>&nbsp; &#9679; &nbsp; По существу это пошаговый (итеративный) алгоритм, который добавляет отдельные точки (по одной за раз) к промежуточной оболочке.</div>
+<div class=blockindent>&nbsp; &#9679; &nbsp; При реализации алгоритма для построения выпуклых оболочек приходится иметь дело с входной геометрией, которая сталкивается с ограничением точности вычислений с плавающей запятой.</div>
+<div class=blockindent>&nbsp; &#9679; &nbsp; Для решения этих проблем Quickhull использует так называемые "толстые" плоскости и объединение граней.</div>
+<div class=blockindent>&nbsp; &#9679; &nbsp; В результате работы алгоритма появляется набор "толстых" граней, которые ограничивают конкретную выпуклую оболочку.</div>
+В последующей части лекции попробуем подробно разъяснить, что это значит!<br><br>
 
-<div class=blockindent>&nbsp; &#9679; &nbsp; Quickhull was published by Barber and Dobkin in 1995</div>
+<!-- Page 9 -->
+Знакомство с алгоритмом начнем с его варианта в 2D пространстве.
+<div class=blockindent>&nbsp; &#9679; &nbsp; Хотелось бы отметить, что это не "реальный" алгоритм Quickhull для 2D пространства (который существует на самом деле).
+Следует думать о нем как о вводной части в трехмерную версию, которая позже будет рассмотрена в этой статье.</div>
+<div class=blockindent>&nbsp; &#9679; &nbsp; Лично я считаю, что зачастую полезно сначала рассмотреть все эти вещи в 2D, чтобы ознакомиться с основными идеями и хорошо понять задачу.</div>
 
-<div class=blockindent>&nbsp; &#9679; &nbsp; It is essentially an iterative algorithm that adds individual points one point at a time to an intermediate hull.</div>
-
-<div class=blockindent>&nbsp; &#9679; &nbsp; When implementing an algorithm to build convex hulls you have to deal with input geometry that pushes the limit of floating point precision.</div>
-
-<div class=blockindent>&nbsp; &#9679; &nbsp; Quickhull uses so called fat planes and face merging to address these problems</div>
-
-<div class=blockindent>&nbsp; &#9679; &nbsp; The output is then a set of ‘fat’ faces that encloses the exact convex hull</div>
-
-In the remainder of the talk will try to explain what this means in detail!<br><br>
-
-
------------------------ Page 9-----------------------
-
-I will start outlining the algorithm in 2D first
-
-<div class=blockindent>&nbsp; &#9679; &nbsp; I like to mention, that this is not the ‘real’ 2D Quickhull algorithm (which actually exists). You should think of it as an introduction of the 3D version we will investigate later in the talk</div>
-
-<div class=blockindent>&nbsp; &#9679; &nbsp; Personally I find it often helpful to think about things in 2D first, to get a good understanding of the problem and to familiarize myself with the basic ideas</div>
-
-
------------------------ Page 10-----------------------
+<!-- Page 10 -->
 <h3>Quickhull 2D: Инициализация оболочки</h3>
 Предположим, что задан набор точек, и нужно построить выпуклую оболочку с использованием алгоритма Quickhull:
-<div class=blockindent>&nbsp; &#9679; &nbsp; Первое, что нужно сделать в Quickhull, - это построить исходную оболочку, из которой можно начать пошагово добавлять точки итеративно.</div>
+<div class=blockindent>&nbsp; &#9679; &nbsp; Первое, что нужно сделать в Quickhull, - это построить исходную оболочку, из которой можно начать пошагово добавлять точки.</div>
 <div class="caption"><img src="img/5.png" width=500></div>
 Поиск этой исходной оболочки начнем с определения крайних точек по каждой из осей координат.
 <div class=blockindent>&nbsp; &#9679; &nbsp; Если по простому, то это означает, что нужно найти точки с наибольшими и наименьшими значениями координат&nbsp;<tt>x</tt>&nbsp;и&nbsp;<tt>y</tt>.</div>
@@ -129,7 +114,7 @@ The next step is to partition the remaining points and assign each point to its 
 Это грамотный способ управления вершинами, поскольку при добавлении к оболочке новой вершины не нужно перебирать все вершины.
 Поэтому <a href="https://ru.wikipedia.org/wiki/%D0%92%D1%80%D0%B5%D0%BC%D0%B5%D0%BD%D0%BD%D0%B0%D1%8F_%D1%81%D0%BB%D0%BE%D0%B6%D0%BD%D0%BE%D1%81%D1%82%D1%8C_%D0%B0%D0%BB%D0%B3%D0%BE%D1%80%D0%B8%D1%82%D0%BC%D0%B0" target="_blank">временна&#769;я сложность алгоритма</a>
 Quickhull обычно равна <span class="lnk" onmouseover="show('линейно-логарифмическое время,<br>максимально быстрая сортировка<br>сравнением')" onmouseout="hide()"><tt>O(n log n)</tt></span> как в двумерном, так и в трехмерном вариантах!
-<div class=warning><b>Предупреждение:</b> Пожалуйста не запутайтесь здесь. Так как представлены в двух и трехмерном вариантах и некоторая терминология совпадает, будем использовать термины «Edge» (ребро, край) и «Face» (грань) взаимозаменяемые! Это поможет, когда позже в этой лекции перейдем к трехмерному варианту алгоритма!
+<div class=warning><b>Предупреждение:</b> Пожалуйста не запутайтесь здесь. Так как алгоритм представлен в двух- и трехмерном вариантах и некоторая терминология совпадает, будем использовать термины «Edge» (ребро, край) и «Face» (грань) взаимозаменяемые! Это поможет, когда позже в этой лекции перейдем к трехмерному варианту алгоритма!
 
 Please don’t get confused here. Since I am presenting in 2D and 3D and some terminology overlaps I will use the terms ‘Edge’ and ‘Face’ interchangeable! This will usually help when we go to 3D later in the talk!</div><br>
 
@@ -138,7 +123,7 @@ Please don’t get confused here. Since I am presenting in 2D and 3D and some te
 Следующим шагом будет добавление новой точки к нашему промежуточному варианту оболочки. Перебираем наши списки конфликтов и находим точку <b>p</b> с наибольшим расстоянием от этой оболочки.
 <div class=blockindent>&nbsp; &#9679; &nbsp; Давайте назовем эту точку точкой просмотра или обзора.</div>
 <div class=blockindent>&nbsp; &#9679; &nbsp; Добавление этой новой точки потребует несколько дополнительных шагов.</div>
-<div class="caption"><img src="img/11.png" width=500></div>
+<div class="caption"><img src="img/11.png" width=500></div><br>
 
 <h3>Quickhull 2D: Поиск горизонта</h3>
 <div class="caption"><img src="img/12.png" width=700></div>
@@ -155,11 +140,11 @@ We can use simple plane tests to classify the new point against each face!</div>
 <div class=blockindent>&nbsp; &#9679; &nbsp; Фактически, горизонт является границей между видимой и невидимой частями текущей оболочки, как оно видится из новой точки просмотра.</div><br>
 
 <h3>Quickhull 2D: Добавление точки к оболочке</h3>
-
+После определения двух вершин горизонта, создадим две новые грани от каждой вершины горизонта для присоединения новой вершины к оболочке.
 Once we identified the two horizon vertices we then create two new faces for each horizon vertex to connect the new vertex to hull
 <div class="caption"><img src="img/13.png" width=500></div><br>
 
------------------------ Page 19-----------------------
+<!-- Page 19 -->
 <h3>Quickhull 2D: Partition orphans</h3>
 <div class="caption"><img src="img/14.png" width=800><br></div>
 После построения новых граней некоторые старые грани стали устаревшими.
@@ -171,7 +156,7 @@ Before we can delete these faces we need to handle their conflict lists since th
 <div class=blockindent>&nbsp; &#9679; &nbsp; We handle this by simply partitioning these orphaned vertices to the new faces</div>
 
 
------------------------ Page 20-----------------------
+<!-- Page 20 -->
 <h3>Quickhull 2D: Добавление точки к оболочке</h3>
 <div class="caption"><img src="img/15.png" width=500><br>
 </div>
@@ -182,38 +167,33 @@ Finally we can now remove all old faces which were visible from the new point an
 <div class=blockindent>&nbsp; &#9679; &nbsp; In our example we continue and grab the next eye point and add it to hull as we just learned</div>
 
 
------------------------ Page 21-----------------------
+<!-- Page 21 -->
 <div class="caption"><img src="img/16.png" width=500><br>
 </div>
 And we do it one more time to find our final hull…
 И делаем это ещё раз, чтобы найти нашу последнюю оболочку...
 
------------------------ Page 22-----------------------
+<!-- Page 22 -->
 <h3>Quickhull 2D:</h3>
 <div class="caption"><img src="img/17.png" width=500><br>
 </div>
 When there are no more vertices (which means all conflict lists are empty) we are done!<br><br>
 
-
------------------------ Page 23-----------------------
-
+<!-- Page 23 -->
 As you can see the basic ideas should be pretty easy to understand
 
 <div class=blockindent>&nbsp; &#9679; &nbsp; In 3D the major implementation difficulties actually arise from managing the lists of vertices, edges, faces and conflicts</div>
 
 <div class=blockindent>&nbsp; &#9679; &nbsp; The other difficulty is dealing with numerical imprecision when classifying  points using plane tests.</div>
 
-
------------------------ Page 24-----------------------
-
+<!-- Page 24 -->
 So far we pretended that our mathematical operations are exact
 
 <div class=blockindent>&nbsp; &#9679; &nbsp; Of course this is *not* true in floating point arithmetic.</div>
 
 <div class=blockindent>&nbsp; &#9679; &nbsp; Let’s investigate how we can deal with those problems.</div>
 
-
------------------------ Page 25-----------------------
+<!-- Page 25 -->
 <h3>Quickhull 2D: Инварианты Invariants</h3>
 <div class="caption"><img src="img/18.png" width=600><br>
 </div>
@@ -225,8 +205,7 @@ When building a convex hull we must maintain geometric invariants during constru
 
 <div class=blockindent>&nbsp; &#9679; &nbsp; I tried to hint this with the dotted line between the outside pointing normals on the slide</div>
 
-
------------------------ Page 26-----------------------
+<!-- Page 26 -->
 <h3>Quickhull 2D: Тест на выпуклость Convexity test</h3>
 <div class="caption"><img src="img/19.png" width=600><br>
 </div>
@@ -240,7 +219,7 @@ Next we need to define what a convex vertex is and how we can test a vertex for 
 <div class=blockindent>&nbsp; &#9679; &nbsp; If both tests are true the vertex is convex, otherwise it must be concave or coplanar</div>
 
 
------------------------ Page 27-----------------------
+<!-- Page 27 -->
 <h3>Quickhull 2D: Надежность вычислений Numerical robustness</h3>
 <div class="caption"><img src="img/20.png" width=600><br>
 coplanar - копланарный, т.е. находящийся в одной плоскости, concave - вогнутый, convex - выпуклый</div>
@@ -254,8 +233,7 @@ Let’s now look at an example where non-convex vertices might become an issue:
 
 <div class=blockindent>&nbsp; &#9679; &nbsp; Note that the point P is not actually moving, but can end up on either side of the plane *just* due  to numerical imprecision</div>
 
-
------------------------ Page 28-----------------------
+<!-- Page 28 -->
 <h3>Quickhull 2D: Толщина плоскостей Fat planes</h3>
 <div class="caption"><img src="img/21.png" width=600><br>
 in front of plane - перед плоскостью, behind plane - за плоскостью, on plane - на плоскости</div>
@@ -274,8 +252,7 @@ We still can classify points when using fat planes as before:
 
 <b>We can now define a vertex to be convex if its distance is larger than epsilon. All other points are either concave or coplanar and should be handled specially!</b><br><br>
 
-
------------------------ Page 29-----------------------
+<!-- Page 29 -->
 <h3>Quickhull 2D: Объединение граней Face merging</h3>
 <div class="caption"><img src="img/22.png" width=500><br>non-convex - невыпуклая, merged - объединенные</div>
 So what do we do when we encounter a non-convex vertex?
@@ -286,8 +263,7 @@ So what do we do when we encounter a non-convex vertex?
 
 <div class=blockindent>&nbsp; &#9679; &nbsp; As you can see on the slide his will remove the concavity and correct the geometrical defect.</div>
 
-
------------------------ Page 30-----------------------
+<!-- Page 30 -->
 <h3>Quickhull 2D: Epsilon</h3>
 <div class="caption"><img src="img/23.png" width=500></div>
 The final question is what epsilon we should choose for our fat planes:
@@ -305,23 +281,12 @@ The final question is what epsilon we should choose for our fat planes:
 
 <!-- Page 31 -->
 На этом знакомство с двумерным вариантом алгоритма Quickhull заканчивается:
-This closes the introduction of Quickhull in 2D:
-
-<div class=blockindent>&nbsp; &#9679; &nbsp; Надеюсь, что у вас появилось первое представление о работе алгоритма.
-I hope you now have some first idea how the algorithm operates</div>
-
-<div class=blockindent>&nbsp; &#9679; &nbsp; Для двумерного пространства уже имеются хорошие алгоритмы построения выпуклых оболочек, которые легко и просто реализовать.
-In 2D there already exist good algorithms to build convex hulls which are easy and straight forward to implement.</div>
-
-<div class=blockindent>&nbsp; &#9679; &nbsp; Так что, если ваша игра двумерна, рекомендую один из них.
-So if your game is 2D I recommend using one of those.</div><br>
+<div class=blockindent>&nbsp; &#9679; &nbsp; Надеюсь, что у вас появилось первое представление о работе алгоритма.</div>
+<div class=blockindent>&nbsp; &#9679; &nbsp; Для двумерного пространства уже имеются хорошие алгоритмы построения выпуклых оболочек, которые легко и просто реализовать.</div>
+<div class=blockindent>&nbsp; &#9679; &nbsp; Так что, если ваша игра двумерна, рекомендую использовать один из них.</div><br>
 
 В оставшейся части обсуждения рассмотрим, как создаются выпуклые оболочки в 3D пространстве.
-In the remainder of the talk we will discuss how we build convex hulls in 3D
-
-<div class=blockindent>&nbsp; &#9679; &nbsp; Алгоритм Quickhull в 3D очень похож на версию, которая только что показана в 2D.
-Quickhull in 3D is very similar to the version I just showed you in 2D</div>
-
+<div class=blockindent>&nbsp; &#9679; &nbsp; Алгоритм Quickhull в 3D очень похож на версию, которая только что показана в описании 2D-варианта.</div>
 <div class=blockindent>&nbsp; &#9679; &nbsp; Наиболее заметным отличием является построение горизонта и мы должны иметь дело с числовой неточностью более тщательно
 The most notable difference is the construction of the horizon and we  have to deal with numerical imprecision more carefully</div><br><br>
 
