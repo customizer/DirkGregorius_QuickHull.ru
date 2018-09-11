@@ -265,7 +265,7 @@ So what do we do when we encounter a non-convex vertex?
 
 <!-- Page 30 -->
 <h3>Quickhull 2D: Epsilon</h3>
-<div class="caption"><img src="img/23.png" width=500></div>
+<div class="caption"><img src="img/23.png" width=400></div>
 The final question is what epsilon we should choose for our fat planes:
 
 <div class=blockindent>&nbsp; &#9679; &nbsp; The CRT defines a floating point epsilon but this does NOT take our input set into account.</div>
@@ -389,550 +389,472 @@ Again we already visited this face so we don’t cross this edge as well
 <!-- Page 49 -->
 <div class="caption"><img src="img/41.png" width=500></div>
 The next face was already visited so no need to cross here too
------------------------ Page 50-----------------------
+<!-- Page 50 -->
 <div class="caption"><img src="img/42.png" width=500></div>
 Finally we would cross the first edge that connects a visible and a non-visible face
-<div class=blockindent>&nbsp; &#9679; &nbsp; We add the edge to the horizon list and return to the previous face</div>
------------------------ Page 51-----------------------
+<div class=blockindent>&nbsp; &#9679; &nbsp; Добавляем ребро в список горизонта и возвращаемся к предыдущей грани.
+We add the edge to the horizon list and return to the previous face</div>
+<!-- Page 51 -->
 <div class="caption"><img src="img/43.png" width=500></div>
+Затем переходим к следующему ребру и возвращаемся к предшествующей ему грани.
 We then continue with the next edge and return to the previous face
------------------------ Page 52-----------------------
+<!-- Page 52 -->
 <div class="caption"><img src="img/44.png" width=500></div>
 Again we cross an edge that connects a visible and invisible face
 <div class=blockindent>&nbsp; &#9679; &nbsp; We save that edge and add it to our horizon and return to the previous face</div>
 
------------------------ Page 53-----------------------
+<!-- Page 53 -->
+Процедура продолжается и собирает края горизонта, пока не возвратимся к начальной грани.
 <div class="caption"><img src="img/45.png" width=500></div>
+
 The procedure continues and collects the horizon edges until we made our way back to the start face
 ----------------------- Page 54-----------------------
 <div class="caption"><img src="img/46.png" width=500></div>
------------------------ Page 55-----------------------
 <div class="caption"><img src="img/47.png" width=500></div>
------------------------ Page 56-----------------------
 <div class="caption"><img src="img/48.png" width=500></div>
------------------------ Page 57-----------------------
 <div class="caption"><img src="img/49.png" width=500></div>
------------------------ Page 58-----------------------
 <div class="caption"><img src="img/50.png" width=500></div>
------------------------ Page 59-----------------------
 <div class="caption"><img src="img/51.png" width=500></div>
------------------------ Page 60-----------------------
 <div class="caption"><img src="img/52.png" width=500></div>
------------------------ Page 61-----------------------
 <div class="caption"><img src="img/53.png" width=500></div>
------------------------ Page 62-----------------------
 <div class="caption"><img src="img/54.png" width=500></div>
------------------------ Page 63-----------------------
 <div class="caption"><img src="img/55.png" width=500></div>
------------------------ Page 64-----------------------
 <div class="caption"><img src="img/56.png" width=500></div>
------------------------ Page 65-----------------------
 <div class="caption"><img src="img/57.png" width=500></div>
------------------------ Page 66-----------------------
 <div class="caption"><img src="img/58.png" width=500></div>
------------------------ Page 67-----------------------
 <div class="caption"><img src="img/59.png" width=500></div>
------------------------ Page 68-----------------------
 <div class="caption"><img src="img/60.png" width=500></div>
------------------------ Page 69-----------------------
 <div class="caption"><img src="img/61.png" width=500></div>
------------------------ Page 70-----------------------
 <div class="caption"><img src="img/62.png" width=500></div>
------------------------ Page 71-----------------------
 <div class="caption"><img src="img/63.png" width=500></div>
------------------------ Page 72-----------------------
-<div class="caption"><img src="img/64.png" width=500></div>
-This is edge we started with and we are done!
+Это то ребро, с которого все начиналось и вот все готово!
+<div class="caption"><img src="img/64.png" width=500></div><br>
+<!-- Page 73 -->
+По завершении действия мы имеем список всех ребер горизонта в направлении против часовой стрелки.
+<div class="caption"><img src="img/65.png" width=500></div>
+<div class=blockindent>&nbsp; &#9679; &nbsp; Теперь можно запросто создать новую треугольную грань для любого ребра горизонта нашего списка.</div>
+<div class=blockindent>&nbsp; &#9679; &nbsp; По существу это будет присоединением новой вершины к текущей оболочке.</div><br>
 
+<!-- Page 74 -->
+На этом знакомство с алгоритмом Quickhull 3D завершается, а продолжается изучение инвариантов.
+This closes the introduction of the 3D Quickhull algorithm and we continue looking into invariants<br><br>
 
-
------------------------ Page 73-----------------------
-
-On termination we have a list of all horizon edges in CCW order
-
--   We can now simply create a new triangle face for each horizon edge in our list
-
--   This essentially connects the new vertex to the current hull
-
-
-
------------------------ Page 74-----------------------
-
-This closes the introduction of the 3D Quickhull algorithm and we continue looking into invariants
-
-
-
------------------------ Page 75-----------------------
-
+<!-- Page 75 -->
+<h3>Quickhull 3D: Invariants</h3>
 As in 2D we must maintain geometric invariants while constructing the hull:
+<div class="caption"><img src="img/66.png" width=500><br>на верхнем рисунке ребро <b>e</b> выпуклое, на нижнем - вогнутое</div>
+<div class=blockindent>&nbsp; &#9679; &nbsp; In 3D we must now guarantee that every edge  is convex</div>
 
--  In 3D we must now guarantee that every edge  is convex
+<div class=blockindent>&nbsp; &#9679; &nbsp; And the argumentation here is basically the same as it was earlier in 2D</div>
 
--  And the argumentation here is basically the same as it was earlier in 2D
-
-
------------------------ Page 76-----------------------
-
+<!-- Page 76 -->
 We now need to define what a convex edge  is and how we can test an edge for convexity:
+<div class="caption"><img src="img/67.png" width=500><br>на верхнем рисунке - проверка левой грани, на нижнем - проверка правой грани</div>
+Для каждого ребра:
 
-For each edge:
+<div class=blockindent>&nbsp; &#9679; &nbsp; First we test if the center of the right face is below the left face plane</div>
 
--   First we test if the center of the right face is below the left face plane
+<div class=blockindent>&nbsp; &#9679; &nbsp; The we test if the center of the left face is below the right face plane</div>
 
--   The we test if the center of the left face is below the right face plane
+<div class=blockindent>&nbsp; &#9679; &nbsp; If both tests are true the edge is convex, otherwise it must be concave or coplanar</div>
 
--   If both tests are true the edge is convex, otherwise it must be concave or coplanar
+<div class=blockindent>&nbsp; &#9679; &nbsp; This is very similar to the 2D test, but we now use the center point of the face</div>
 
--   This is very similar to the 2D test, but we now use the center point of the face
+<div class=blockindent>&nbsp; &#9679; &nbsp; The face center is simply the average of the face vertices</div><br>
 
--   The face center is simply the average of the face vertices
+<!-- Page 77 -->
+<h3>Quickhull 3D: Epsilon</h3>
+<div class="caption"><img src="img/68.png" width=500></div>
+Также как и в двухмерном варианте алгоритма, нужно значение "эпсилон" для определения толщины плоских плоскостей и мы просто расширяем нашу формулу до 3D!
+As in 2D we need an epsilon to define the thickness of flat planes and we just expand our formula to 3D!<br><br>
 
+<!-- Page 78 -->
+<h3>Quickhull 3D: Соединение копланарных граней</h3>
+<div class="caption"><img src="img/69.png" width=600><br>Копланарные грани F1 (с вершинами V1, V2, V3) и F2 (с вершинами V5, V3, V2) объединяются в одну грань F12 (с вершинами V1, V2, V5, V3)</div><br>
+При обнаружении невыпуклого ребра, объединяем две смежные грани.
+<div class=blockindent>&nbsp; &#9679; &nbsp; При этом добавляется ещё один шаг в наш пошаговый (итерационный) цикл.</div>
+<div class=blockindent>&nbsp; &#9679; &nbsp; Предположим, что грани face1 и face2 в предыдущем примере были невыпуклыми.</div>
 
------------------------ Page 77-----------------------
+<div class=blockindent>&nbsp; &#9679; &nbsp; Теперь объединим face1 и face2 в новую полигональную грань, заменив исходные грани F1 и F2.
+We would now merge face1 and face2 into a new polygonal face replacing the original faces F1 and F2</div>
 
-As in 2D we need an epsilon to define the thickness of flat planes and we just expand our formula to 3D!
+<div class=blockindent>&nbsp; &#9679; &nbsp; Как уже упоминалось в начале лекции, мы не ограничиваемся треугольными гранями.
+As mentioned in the beginning we are not restricting ourselves to triangle faces</div>
 
+<!-- Page 79 -->
+<h3>Quickhull 3D: Проблемная оболочка</h3>
+<div class="caption"><img src="img/70.png" width=400><br>Ситуация: грани F1 и F3 видимы из новой точки P, а F2 нет!</div><br>
+Давайте теперь рассмотрим пример из оригинальной статьи Quickhull:
+<div class=blockindent>&nbsp; &#9679; &nbsp; Основная тема следующих слайдов реально показать что произойдет, если не объединять грани и как можно столкнуться с кучей геометрических и топологических проблем!</div>
+<div class=blockindent>&nbsp; &#9679; &nbsp; Все, что нужно понять здесь и сейчас, - объединение граней в самом деле критическая операция!</div><br>
+Ситуация выглядит примерно так: грани <tt>F1</tt> и <tt>F3</tt> видимы из новой точки <tt>P</tt>, в то время как грань <tt>F2</tt> не видна!
+<div class=blockindent>&nbsp; &#9679; &nbsp; Фигуру в этом примере можно рассматривать как простой тетраэдр - четырехгранник.</div>
 
------------------------ Page 78-----------------------
+<div class=blockindent>&nbsp; &#9679; &nbsp; Передняя грань находится в плоскости экрана и не слита в одну большую грань треугольника, но фактически похожа на веер из трех граней.
+The front face is in the screen plane and was  not  merged into one big triangle face, but is essentially a fan of three faces</div>
 
-So when we detect a non-convex edge we now merge the two adjacent faces
+<div class=blockindent>&nbsp; &#9679; &nbsp; Нам кажется, что грани F1 – F3 копланарны. It appears to us as if faces F1 –  F3 are coplanar</div>
 
--   This adds another step to our iterative loop
-
--   Let’s assume face1 and face2 were non-convex in our previous example
-
--   We would now merge face1 and face2 into a new polygonal face replacing the original faces F1 and F2
-
--   As mentioned in the beginning we are not restricting ourselves to triangle faces
-
-
------------------------ Page 79-----------------------
-
-Let’s now investigate the example from the original Quickhull  paper:
-
--   The message of the next slides is really to show what will happened if you DON’T merge faces and how you can run into a bunch of geometrical and topological problems!
-
--   All you need to get here right now is that face merging is really a critical operation !
-
-
-The situation presents itself like this: Faces F1 and F3 are visible from the new point 𝐏while face F2 s not!
-
--   Basically you can think of a simple tetrahedron here
-
--   The front face is in the screen plane and was  not  merged into one big triangle face,
-
-    but is essentially a fan of three faces
-
--   It appears to us as if faces F1 –  F3 are coplanar
-
--   But the bad news is that coplanar only exists in an ideal world, but not in the world of limited precision numbers!
+<div class=blockindent>&nbsp; &#9679; &nbsp; Но плохая новость в том, что копланарность существует только в идеальном мире, а не в мире чисел с ограничениями по точности!
+But the bad news is that coplanar only exists in an ideal world, but not in the world of limited precision numbers!</div>
 
 
------------------------ Page 80-----------------------
-
+<!-- Page 80 -->
+<div class="caption"><img src="img/71.png" width=400><br>Ситуация: грани F1 и F3 видимы из новой точки P, а F2 нет!</div><br>
+Что на самом деле происходит (и я несколько преувеличиваю здесь ситуацию) заключается в том, что:
 What really happens is (and I am exaggerating the situation here a little bit) is that:
 
--   The two center points are actually moved inside
+<div class=blockindent>&nbsp; &#9679; &nbsp; Две центральные точки фактически сдвинуты внутрь. The two center points are actually moved inside</div>
 
--   And the edges between F1 and F2 and also F2 and F3 are concave
+<div class=blockindent>&nbsp; &#9679; &nbsp; А ребра между F1 и F2, а также F2 и F3 являются вогнутыми.
+And the edges between F1 and F2 and also F2 and F3 are concave</div>
 
-
-
------------------------ Page 81-----------------------
-
+<!-- Page 81 -->
+<div class="caption"><img src="img/72.png" width=700></div>
 Now let’s rotate the tetrahedron and assume we are now looking from behind point P and at the bottom :
 
--   You can hopefully see the new point and the bottom edges of the three faces
+<div class=blockindent>&nbsp; &#9679; &nbsp; You can hopefully see the new point and the bottom edges of the three faces</div>
 
--   Due to the non-convexity the new point gets kind of locked behind the three planes that leads to this weird situation
+<div class=blockindent>&nbsp; &#9679; &nbsp; Due to the non-convexity the new point gets kind of locked behind the three planes that leads to this weird situation</div>
 
-
-
------------------------ Page 82-----------------------
-
+<!-- Page 82 -->
+<h3>Урезанный горизонт</h3>
+<div class="caption"><img src="img/73.png" width=400><br>The depth-first search will yield the horizon in CCW order!</div><br>
 We continue and build now the horizon as we learned earlier using the DFS
 
--  The results in five horizon edges a, b, c, d, and e as sketched on the slide
+<div class=blockindent>&nbsp; &#9679; &nbsp; The results in five horizon edges a, b, c, d, and e as sketched on the slide</div>
+
+<!-- Page 83 -->
+<h3>Новые грани</h3>
+<div class="caption"><img src="img/74.png" width=400></div>
+Next we replace F1 and F3 with 5  new faces for each edge a−e
 
 
+<div class=blockindent>&nbsp; &#9679; &nbsp; Since the outcome of the operation is  pretty interesting let’s look at each of the new faces individually</div>
 
------------------------ Page 83-----------------------
+<!-- Page 84 -->
+<h3>Грань A</h3>
+<div class="caption"><img src="img/75.png" width=400></div>
+Создаем грань для ребра a.
+<div class=blockindent>&nbsp; &#9679; &nbsp; Обратите внимание, что эта грань частично перекрывает грань face2, которая ещё находится в оболочке.
+Note how this face partially overlaps face2 which is still on the hull</div>
 
-Next we  replace 𝐹  and 𝐹   with 5  new faces for each edge a−e
+<!-- Page 85 -->
+<h3>Грань B</h3>
+<div class="caption"><img src="img/76.png" width=400></div>
+Создаем грань для ребра b.
+<div class=blockindent>&nbsp; &#9679; &nbsp; Обратите внимание, что эта грань с перевернутой ориентацией (по часовой стрелке), а также разделяет и ребро с FA.
+Note that this face has flipped (CW) orientation and also shares and edge with FA</div>
 
-                    1       3
+<!-- Page 86 -->
+<h3>Грань C</h3>
+<div class="caption"><img src="img/77.png" width=400></div>
+Создаем грань для ребра c.
+<div class=blockindent>&nbsp; &#9679; &nbsp; Ура, здесь ничего плохого нет.
+Hooray, nothing wrong here</div>
 
-- Since the outcome of the operation is  pretty interesting let’s look at each of the new faces individually
+<!-- Page 87 -->
+<h3>Грань D</h3>
+<div class="caption"><img src="img/78.png" width=400></div>
+Создаем грань для ребра d.
+<div class=blockindent>&nbsp; &#9679; &nbsp; Note that this face has flipped (CW) orientation again and also shares an edge with FA and FB</div>
 
+<!-- Page 88 -->
+<h3>Грань E</h3>
+<div class="caption"><img src="img/79.png" width=400></div>
+Создаем грань для ребра e.
+<div class=blockindent>&nbsp; &#9679; &nbsp; We now have four faces sharing the same edge and also partially overlapping each other</div>
 
------------------------ Page 84-----------------------
-
-We build a face for edge a
-
--  Note how this face partially overlaps face2 which is still on the hull
-
-
------------------------ Page 85-----------------------
-
-We build a face for edge b
-
--  Note that this face has flipped (CW) orientation and also shares and edge with FA
-
-
------------------------ Page 86-----------------------
-
-We build a face for edge c
-
--   Hooray, nothing wrong here
-
-
------------------------ Page 87-----------------------
-
-We build a face for edge d
-
--  Note that this face has flipped (CW) orientation again and also shares an edge with FA and FB
-
-
------------------------ Page 88-----------------------
-
-We build a face for edge e
-
--  We now have four faces sharing the same edge and also partially overlapping each other
-
-
------------------------ Page 89-----------------------
+<!-- Page 89 -->
+<h3>Грань 2</h3>
 <div class="caption"><img src="img/80.png" width=500></div>
--  Due to numerical imprecision face2 was still identified as visible from P and will remain on the hull
+<div class=blockindent>&nbsp; &#9679; &nbsp; Due to numerical imprecision face2 was still identified as visible from P and will remain on the hull</div>
 
-
------------------------ Page 90-----------------------
-
-What happened here is that we introduced a couple of severe errors because our hull was not in an healthy state when we started adding the new point.
+<!-- Page 90 -->
+<h3>Ошибки</h3>
+What happened here is that we introduced a couple of severe errors because our hull was not in an healthy state when we started adding the new point.<br>
 
 As a result the new faces are violating a bunch geometrical and topological invariants:
 
--   Two faces are flipped upside down (that means the  normals are pointing inside)
+<div class=blockindent>&nbsp; &#9679; &nbsp; Two faces are flipped upside down (that means the  normals are pointing inside)</div>
 
--   Four faces share the same edge (which make them partially and fully overlapping each other)
-
-
-
-As you can imagine repairing those errors would become pretty involved.
-
-The good news are that I haven’t run into any of the described issues when properly merging faces during the hull construction.
-
-So hopefully you can see that it essential for a robust implementation to maintain a healthy hull during construction.
+<div class=blockindent>&nbsp; &#9679; &nbsp; Four faces share the same edge (which make them partially and fully overlapping each other)</div>
 
 
 
------------------------ Page 91-----------------------
+As you can imagine repairing those errors would become pretty involved.<br>
+
+The good news are that I haven’t run into any of the described issues when properly merging faces during the hull construction.<br>
+
+So hopefully you can see that it essential for a robust implementation to maintain a healthy hull during construction.<br><br>
+
+<!-- Page 91 -->
 <h3>Half-Edge mesh</h3>
 <div class="caption"><img src="img/81.png" width=500></div>
 We haven’t talked about a data structure for convex  polyhedra yet. So before we start looking into face merging in more detail, let’s talk about a possible data structure first:
 
--   Obviously there are many ways to describe a convex polyhedron
+<div class=blockindent>&nbsp; &#9679; &nbsp; Obviously there are many ways to describe a convex polyhedron</div>
 
--   A common data structure is the so called Half-Edge data structure which is an edge centric mesh representation
+<div class=blockindent>&nbsp; &#9679; &nbsp; A common data structure is the so called Half-Edge data structure which is an edge centric mesh representation</div>
 
--   The half edge data structure makes it easy to iterate edges of a face and to access neighboring faces
+<div class=blockindent>&nbsp; &#9679; &nbsp; The half edge data structure makes it easy to iterate edges of a face and to access neighboring faces</div>
 
 
 
 For each face we store:
 
--   A half-edge that defines the entry into a circular list around the face
+<div class=blockindent>&nbsp; &#9679; &nbsp; A half-edge that defines the entry into a circular list around the face</div>
 
 
 For each edge we store:
 
--   The previous and next edge that build the circular list around the face
+<div class=blockindent>&nbsp; &#9679; &nbsp; The previous and next edge that build the circular list around the face</div>
 
--   A twin edge to cross over to the adjacent face
+<div class=blockindent>&nbsp; &#9679; &nbsp; A twin edge to cross over to the adjacent face</div>
 
--   And the tail vertex of the edge
+<div class=blockindent>&nbsp; &#9679; &nbsp; And the tail vertex of the edge</div>
 
--   Note that we don’t need to store the head vertex since it is simple the tail vertex of the twin edge
+<div class=blockindent>&nbsp; &#9679; &nbsp; Note that we don’t need to store the head vertex since it is simple the tail vertex of the twin edge</div>
 
-
------------------------ Page 92-----------------------
-
+<!-- Page 92 -->
 We learned that face merging is the essential operation to maintain a healthy hull.
 
--  Here is an example how to merge two faces using the half-edge data structure.
+<div class=blockindent>&nbsp; &#9679; &nbsp; Here is an example how to merge two faces using the half-edge data structure.</div>
 
--  The situation is that we are about to merge the left into the right face
+<div class=blockindent>&nbsp; &#9679; &nbsp; The situation is that we are about to merge the left into the right face</div>
 
--  This means that edge e and its twin will go away and also the left face
+<div class=blockindent>&nbsp; &#9679; &nbsp; This means that edge e and its twin will go away and also the left face</div>
 
-
-
------------------------ Page 93-----------------------
-
+<!-- Page 93 -->
 First we make sure that the absorbing right face does not reference the edge we are about to delete (e.g. we use edge->prev here)
 
-
-
------------------------ Page 94-----------------------
-
+<!-- Page 94 -->
 Next we must make sure that all edges of the absorbed left face will now reference the right face as their owner
 
-
------------------------ Page 95-----------------------
-
+<!-- Page 95 -->
 Finally we need to connect the incoming and outgoing edges
 
--   Also note that we can access all necessary data for the merge operation just from the shared edge between the two adjacent faces we are about to merge
+<div class=blockindent>&nbsp; &#9679; &nbsp; Also note that we can access all necessary data for the merge operation just from the shared edge between the two adjacent faces we are about to merge</div>
 
-
-
------------------------ Page 96-----------------------
-
+<!-- Page 96 -->
 The result of two of merged faces is a polygonal face with its vertices  not quite coplanar
 
--   Remember that we are in the world of limited precision numbers
+<div class=blockindent>&nbsp; &#9679; &nbsp; Remember that we are in the world of limited precision numbers</div>
 
--   The Newell algorithm builds a best fit plane in the least square sense which minimizes the distance of the vertices
+<div class=blockindent>&nbsp; &#9679; &nbsp; The Newell algorithm builds a best fit plane in the least square sense which minimizes the distance of the vertices</div>
 
-
------------------------ Page 97-----------------------
-
+<!-- Page 97 -->
 I added some formulas for completeness and convenience, but going into detail here would get us off topic.
 
--   Both Gino’s and Christer’s books cover Newell planes and I also added some additional links in the references
+<div class=blockindent>&nbsp; &#9679; &nbsp; Both Gino’s and Christer’s books cover Newell planes and I also added some additional links in the references</div>
 
-
------------------------ Page 98-----------------------
-
+<!-- Page 98 -->
 Now let’s look at one important topological invariant of a convex hull.
 
--   The most important one for us is that each vertex must have at least three adjacent faces
+<div class=blockindent>&nbsp; &#9679; &nbsp; The most important one for us is that each vertex must have at least three adjacent faces</div>
 
--   We call a vertex redundant if it does not satisfy this invariant
-
+<div class=blockindent>&nbsp; &#9679; &nbsp; We call a vertex redundant if it does not satisfy this invariant</div>
 
 
 Of course there are other topological invariants, like:
 
--   Each face must have at least three neighbors
+<div class=blockindent>&nbsp; &#9679; &nbsp; Each face must have at least three neighbors</div>
 
--   Each edge is shared exactly between two faces
+<div class=blockindent>&nbsp; &#9679; &nbsp; Each edge is shared exactly between two faces</div>
 
--   Each face of a convex polyhedron must be a convex polygon
+<div class=blockindent>&nbsp; &#9679; &nbsp; Each face of a convex polyhedron must be a convex polygon</div>
 
--   But as is turns out we don’t need to deal with those directly
+<div class=blockindent>&nbsp; &#9679; &nbsp; But as is turns out we don’t need to deal with those directly</div>
 
 
------------------------ Page 99-----------------------
-
+<!-- Page 99 -->
 When merging faces we might violate topological invariants and need to fix those:
 
 
 
 Consider the merge sequence in the above picture and how it can lead to topological errors:
 
--   We merge face1 into face3
+<div class=blockindent>&nbsp; &#9679; &nbsp; We merge face1 into face3</div>
 
 This creates a couple of problems:
 
--   Vertex v has now only two adjacent faces and has become redundant
+<div class=blockindent>&nbsp; &#9679; &nbsp; Vertex v has now only two adjacent faces and has become redundant</div>
 
--   Face2 has only two neighbors
+<div class=blockindent>&nbsp; &#9679; &nbsp; Face2 has only two neighbors</div>
 
--   Face13 is not convex
+<div class=blockindent>&nbsp; &#9679; &nbsp; Face13 is not convex</div>
 
 
------------------------ Page 100-----------------------
-
+<!-- Page 100 -->
 We detect this error by checking the adjacent faces of the in- and outgoing edges ->
 
 Both edges point to face2
 
--   Since face2 is a triangle we will not connect the in- and outgoing edge, but use the non-shared edge instead
+<div class=blockindent>&nbsp; &#9679; &nbsp; Since face2 is a triangle we will not connect the in- and outgoing edge, but use the non-shared edge instead</div>
 
--   Note that face2 is redundant as well since all vertices are contained in face13 and can be deleted
+<div class=blockindent>&nbsp; &#9679; &nbsp; Note that face2 is redundant as well since all vertices are contained in face13 and can be deleted</div>
 
--   Vertex v has also become obsolete and will be deleted as well
+<div class=blockindent>&nbsp; &#9679; &nbsp; Vertex v has also become obsolete and will be deleted as well</div>
 
 The trick here is that when we merge two faces we check for this error and fix it immediately!
 
-
-
------------------------ Page 101-----------------------
-
+<!-- Page 101 -->
 Let’s look at the previous example again.
 
 Consider now the slightly different merge sequence:
 
--   We now merge face2 into face1
+<div class=blockindent>&nbsp; &#9679; &nbsp; We now merge face2 into face1</div>
 
 Again:
 
--   Vertex v has now only two adjacent faces and has become redundant
+<div class=blockindent>&nbsp; &#9679; &nbsp; Vertex v has now only two adjacent faces and has become redundant</div>
 
--   Besides this I don’t notice any other problem in this case
+<div class=blockindent>&nbsp; &#9679; &nbsp; Besides this I don’t notice any other problem in this case</div>
 
-
------------------------ Page 102-----------------------
-
+<!-- Page 102 -->
 We detect this error again by checking the adjacent faces of the in- and outgoing
 
 edges -> Both edges point to face3 here
 
--   Since face3 has now more than three vertices we cannot apply the same fixing strategy as before
+<div class=blockindent>&nbsp; &#9679; &nbsp; Since face3 has now more than three vertices we cannot apply the same fixing strategy as before</div>
 
--   Instead we simply extend the incoming edge to the next vertex and delete the outgoing edge
+<div class=blockindent>&nbsp; &#9679; &nbsp; Instead we simply extend the incoming edge to the next vertex and delete the outgoing edge</div>
 
--   Again vertex v has become obsolete and should be deleted as well
+<div class=blockindent>&nbsp; &#9679; &nbsp; Again vertex v has become obsolete and should be deleted as well</div>
 
 Again when we merge faces we check for this error and fix it immediately!
 
-
------------------------ Page 103-----------------------
-
+<!-- Page 103 -->
 Another problem you will encounter when merging faces is that you might a large number of new faces that should be all merged:
 
--   Let’s call this a merge cycle
+<div class=blockindent>&nbsp; &#9679; &nbsp; Let’s call this a merge cycle</div>
 
 Imagine we are building the convex of hull of a cylinder and we are about to add the final vertex of the top face:
 
--   This vertex of course presents itself as in the same plane as the other vertices.
+<div class=blockindent>&nbsp; &#9679; &nbsp; This vertex of course presents itself as in the same plane as the other vertices.</div>
 
--   In this situation we create many new faces which are roughly coplanar and need to be merged
+<div class=blockindent>&nbsp; &#9679; &nbsp; In this situation we create many new faces which are roughly coplanar and need to be merged</div>
 
--   Ideally we would like to merge all new faces into one face as shown on the right hand side
+<div class=blockindent>&nbsp; &#9679; &nbsp; Ideally we would like to merge all new faces into one face as shown on the right hand side</div>
 
-
------------------------ Page 104-----------------------
-
+<!-- Page 104 -->
 The problem is now that we practically merge one face after the other:
 
--   Whenever we merge two faces we rebuild the face plane.
+<div class=blockindent>&nbsp; &#9679; &nbsp; Whenever we merge two faces we rebuild the face plane.</div>
 
--   Rebuilding the face can jiggle the plane and an edge between two faces can become temporarily convex and prevent us from merging the whole cycle
+<div class=blockindent>&nbsp; &#9679; &nbsp; Rebuilding the face can jiggle the plane and an edge between two faces can become temporarily convex and prevent us from merging the whole cycle</div>
 
--   In the worst case this can introduce concave faces which are now NOT merged properly
+<div class=blockindent>&nbsp; &#9679; &nbsp; In the worst case this can introduce concave faces which are now NOT merged properly</div>
 
 
 
 Here are some ideas how to address this:
 
--   The faces with the largest area should be the most stable w.r.t. the orientation of the face plane. So merging into the largest faces first reduces jiggle. Think of merging the little sister into the big daddy
+<div class=blockindent>&nbsp; &#9679; &nbsp; The faces with the largest area should be the most stable w.r.t. the orientation of the face plane. So merging into the largest faces first reduces jiggle. Think of merging the little sister into the big daddy</div>
 
--   You can also introduce an absolute tolerance to increase your merge radius and make your merge cycle less sensitive for these situations.
+<div class=blockindent>&nbsp; &#9679; &nbsp; You can also introduce an absolute tolerance to increase your merge radius and make your merge cycle less sensitive for these situations.</div>
 
--   This is basically how I handle this problem at the moment since for physics we want as large faces as possible for stability reasons and do not aim for the tightest hull.
+<div class=blockindent>&nbsp; &#9679; &nbsp; This is basically how I handle this problem at the moment since for physics we want as large faces as possible for stability reasons and do not aim for the tightest hull.</div>
 
--   If you are working with collision margins it is probably a good idea to make this absolute tolerance a small percentage of that margin
+<div class=blockindent>&nbsp; &#9679; &nbsp; If you are working with collision margins it is probably a good idea to make this absolute tolerance a small percentage of that margin</div>
 
 
------------------------ Page 105-----------------------
-
+<!-- Page 105 -->
 Another idea to deal with this problem is to NOT rebuild the face planes at all when merging to faces:
 
--   For both faces you have your best fit plane and the vertices (which I tried to sketch on the slide)
+<div class=blockindent>&nbsp; &#9679; &nbsp; For both faces you have your best fit plane and the vertices (which I tried to sketch on the slide)</div>
 
--   We can now compute the absolute distance of the right face’s vertices to the left face’s plane and vice versa
+<div class=blockindent>&nbsp; &#9679; &nbsp; We can now compute the absolute distance of the right face’s vertices to the left face’s plane and vice versa</div>
 
--   Then we simply keep the face plane that minimizes the distance instead of rebuilding it
+<div class=blockindent>&nbsp; &#9679; &nbsp; Then we simply keep the face plane that minimizes the distance instead of rebuilding it</div>
 
------------------------ Page 106-----------------------
-
+<!-- Page 106 -->
 Let’s close this part how we could use face merging to deal with defect hulls:
 
--  At each iteration the basic assumption is to start with a healthy hull
+<div class=blockindent>&nbsp; &#9679; &nbsp; At each iteration the basic assumption is to start with a healthy hull</div>
 
--   When adding the vertex we need to inspect all new faces for possible defects at their edges between each other and at the horizon
+<div class=blockindent>&nbsp; &#9679; &nbsp; When adding the vertex we need to inspect all new faces for possible defects at their edges between each other and at the horizon</div>
 
--   These are the weak spots where might have introduced new errors
+<div class=blockindent>&nbsp; &#9679; &nbsp; These are the weak spots where might have introduced new errors</div>
 
--  An easy strategy is to iterate all new faces and repair each edge one by one
+<div class=blockindent>&nbsp; &#9679; &nbsp; An easy strategy is to iterate all new faces and repair each edge one by one</div>
 
-
------------------------ Page 107-----------------------
-
+<!-- Page 107 -->
 This closes the theory and in the remainder of this talk I like to share some quick tips about a possible implementation
 
-
-
------------------------ Page 108-----------------------
-
+<!-- Page 108 -->
 The major performance pitfall is bad memory management of the half-edge data structure:
 
--  The convex hull for N vertices is bounded
+<div class=blockindent>&nbsp; &#9679; &nbsp; The convex hull for N vertices is bounded</div>
 
--  Worst case is that all input vertices are on the hull:
+<div class=blockindent>&nbsp; &#9679; &nbsp; Worst case is that all input vertices are on the hull:</div>
 
-- The number of vertices is then at most V = N
+<div class=blockindent>&nbsp; &#9679; &nbsp; The number of vertices is then at most V = N</div>
 
-- The number of edges is then at most E = 3N – 6
+<div class=blockindent>&nbsp; &#9679; &nbsp; The number of edges is then at most E = 3N – 6</div>
 
-- The number of faces is then at most F = 2N – 4
+<div class=blockindent>&nbsp; &#9679; &nbsp; The number of faces is then at most F = 2N – 4</div>
 
-- Test with Euler’s formula: V –  E + F = 2
+<div class=blockindent>&nbsp; &#9679; &nbsp; Test with Euler’s formula: V –  E + F = 2</div>
 
 
 
 In our implementation we can pre-allocate one buffer for vertices, half-edges, and faces and manage this buffer in a free list
 
--   Ideally we will just have one big allocation per hull construction!
+<div class=blockindent>&nbsp; &#9679; &nbsp; Ideally we will just have one big allocation per hull construction!</div>
 
--   This becomes especially important if you plan to compute convex hulls at runtime (e.g. for destruction)
+<div class=blockindent>&nbsp; &#9679; &nbsp; This becomes especially important if you plan to compute convex hulls at runtime (e.g. for destruction)</div>
 
 
 
 Here are some practical details:
 
--  Don’t forget that you need to allocate half-edges (which is twice the number of edges)
+<div class=blockindent>&nbsp; &#9679; &nbsp; Don’t forget that you need to allocate half-edges (which is twice the number of edges)</div>
 
-- We also need to account for temporary allocations (e.g. horizon faces)
+<div class=blockindent>&nbsp; &#9679; &nbsp; We also need to account for temporary allocations (e.g. horizon faces)</div>
 
--   In practice I just double the buffer size
+<div class=blockindent>&nbsp; &#9679; &nbsp; In practice I just double the buffer size</div>
 
-
------------------------ Page 109-----------------------
-
+<!-- Page 109 -->
 Let’s start with the vertex structure.
 
--    I am using an intrusive list to store the vertices
+<div class=blockindent>&nbsp; &#9679; &nbsp; I am using an intrusive list to store the vertices</div>
 
--   The vertices are either on the hull or in a conflict list
+<div class=blockindent>&nbsp; &#9679; &nbsp; The vertices are either on the hull or in a conflict list</div>
 
--    So obviously we have to include the list pointers here.
+<div class=blockindent>&nbsp; &#9679; &nbsp; So obviously we have to include the list pointers here.</div>
 
--   We can optionally also store an edge leaving the vertex.
+<div class=blockindent>&nbsp; &#9679; &nbsp; We can optionally also store an edge leaving the vertex.</div>
 
--   This is not needed for constructing the hull, but it can be useful for post-processing if you like e.g. to iterate all adjacent faces of the vertex
+<div class=blockindent>&nbsp; &#9679; &nbsp; This is not needed for constructing the hull, but it can be useful for post-processing if you like e.g. to iterate all adjacent faces of the vertex</div>
 
--    Of course we also to need store the position of a vertex
+<div class=blockindent>&nbsp; &#9679; &nbsp; Of course we also to need store the position of a vertex</div>
 
------------------------ Page 110-----------------------
-
+<!-- Page 110 -->
 Now let’s have a quick look how we can potentially implement a half-edge:
 
--   As we would expect this definition maps pretty directly to a possible data structure
+<div class=blockindent>&nbsp; &#9679; &nbsp; As we would expect this definition maps pretty directly to a possible data structure</div>
 
--   We store a pointer to the tail vertex of the edge
+<div class=blockindent>&nbsp; &#9679; &nbsp; We store a pointer to the tail vertex of the edge</div>
 
--   The half-edges build a circular list around the face so we also need to store the list pointers here
+<div class=blockindent>&nbsp; &#9679; &nbsp; The half-edges build a circular list around the face so we also need to store the list pointers here</div>
 
--   And of course we also store the twin edge to cross over to the adjacent face
+<div class=blockindent>&nbsp; &#9679; &nbsp; And of course we also store the twin edge to cross over to the adjacent face</div>
 
--    Finally we also keep a reference to the parent face of the edge
+<div class=blockindent>&nbsp; &#9679; &nbsp; Finally we also keep a reference to the parent face of the edge</div>
 
 
------------------------ Page 111-----------------------
-
+<!-- Page 111 -->
 Finally the face structure:
 
--    I am also using an intrusive list here, so we have to include the list pointers again
+<div class=blockindent>&nbsp; &#9679; &nbsp; I am also using an intrusive list here, so we have to include the list pointers again</div>
 
--    And of course there is a pointer to the first edge starting the circular list around the face
+<div class=blockindent>&nbsp; &#9679; &nbsp; And of course there is a pointer to the first edge starting the circular list around the face</div>
 
--    Finally it is possibly a good idea to store our conflict list here as well
+<div class=blockindent>&nbsp; &#9679; &nbsp; Finally it is possibly a good idea to store our conflict list here as well</div>
 
 
------------------------ Page 112-----------------------
-
+<!-- Page 112 -->
 Finally some high-level code examples to give you an idea of a possible
 
 implementation:
@@ -945,18 +867,14 @@ implementation:
 
 Explain a bit…
 
-
------------------------ Page 113-----------------------
-
+<!-- Page 113 -->
 The code snippets shows the iterative AddVertex() function
 
 -   We add new points until our conflict lists are empty
 
 Explain a bit…
 
-
------------------------ Page 114-----------------------
-
+<!-- Page 114 -->
 So you want to implement Qhull yourself and I talked now for nearly an hour and
 
 there is no code!
@@ -971,9 +889,7 @@ This closes the talk and hopefully my presentation will help you to understand a
 
 Thank you!
 
-
------------------------ Page 115-----------------------
-
+<!-- Page 115 -->
 Before I close I like to thank a bunch of people!
 
 -   Thanks to Valve for giving me permission to present to you today
@@ -987,11 +903,7 @@ Before I close I like to thank a bunch of people!
 -   Special thanks to John Lloyd for sharing his beautiful JAVA Quickhull implementation and making it open source
 
 
------------------------ Page 116-----------------------
-
-
------------------------ Page 117-----------------------
-
+<!-- Page 117 -->
 If you liked this talk and if you want to see more cool Valve presentations please visit out website!
 
 
