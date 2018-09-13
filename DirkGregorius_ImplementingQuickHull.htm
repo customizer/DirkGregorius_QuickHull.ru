@@ -14,17 +14,15 @@
 Добрый день! Меня зовут Дирк, и я инженер-программист в Valve.<br><br>
 Некоторые из вас возможно заметили, что я изменил заголовок своей лекции на: "Реализация алгоритма выпуклой оболочки".<br>
 Когда я пересказывал эту лекция в Valve, одним из вопросов был: "Почему презентация о выпуклой оболочке? Разве это не хорошо понимаемый алгоритм?"<br>
-
 На мой взгляд это отчасти верно. Можно найти несколько презентаций об основах теории выпуклой оболочки и аналитических статей некоторой сложности, но вряд ли
 это все имело отношение к реализации данного алгоритма.
 Особенно в производственной среде, где приходится иметь дело со всеми видами недостаточно определенной входной геометрией!
 Так что, эта лекция будет охватывать, конечно же, основную теорию Quickhull, но также потратим много времени на изучение проблем, с которыми вы можете столкнуться при реализации Quickhull, и способах их решения.<br><br>
 
-
 <h2>План лекции</h2>
 Вначале хотелось бы быстро изложить план лекции:
 <div class=blockindent>&nbsp; &#9679; &nbsp; После короткого вступления сначала будет разговор об алгоритме выпуклой оболочки (Quickhull) в двумерном пространстве.</div>
-<div class=blockindent>&nbsp; &#9679; &nbsp; Затем продолжим описание с геометрическими постоянными (инвариантами), которые нужно поддерживать при построении оболочки, во избежание вычислительных проблем. Then we continue with geometrical invariants which we need to maintain while constructing the hull to avoid numerical problems</div>
+<div class=blockindent>&nbsp; &#9679; &nbsp; Затем продолжим описание с геометрическими постоянными (инвариантами), которых нужно придерживаться при построении оболочки, во избежание проблем с вычислениями.</div>
 <div class=blockindent>&nbsp; &#9679; &nbsp; После знакомства с двумерным вариантом, тут же погружаемся в трехмерную версию быстрой оболочки.</div>
 <div class=blockindent>&nbsp; &#9679; &nbsp; Затем исследуем геометрические и топологические инварианты при построении оболочки в трехмерном пространстве и
 We then investigate geometrical and topological invariants while constructing the hull in 3D and close with some implementation details.</div><br>
@@ -80,53 +78,49 @@ Sergiy will show you how to implement awesome physics visualization right after 
 Знакомство с алгоритмом начнем с его варианта в 2D пространстве.
 <div class=blockindent>&nbsp; &#9679; &nbsp; Хотелось бы отметить, что это не "реальный" алгоритм Quickhull для 2D пространства (который существует на самом деле).
 Следует думать о нем как о вводной части в трехмерную версию, которая позже будет рассмотрена в этой статье.</div>
-<div class=blockindent>&nbsp; &#9679; &nbsp; Лично я считаю, что зачастую полезно сначала рассмотреть все эти вещи в 2D, чтобы ознакомиться с основными идеями и хорошо понять задачу.</div>
+<div class=blockindent>&nbsp; &#9679; &nbsp; Лично я считаю, что зачастую полезно сначала рассмотреть все эти вещи в 2D, чтобы ознакомиться с основными идеями и хорошо понять задачу.</div><br><br>
 
 <!-- Page 10 -->
-<h3>Quickhull 2D: Инициализация оболочки</h3>
+<h2>Quickhull 2D: Инициализация оболочки</h2>
 Предположим, что задан набор точек, и нужно построить выпуклую оболочку с использованием алгоритма Quickhull:
 <div class=blockindent>&nbsp; &#9679; &nbsp; Первое, что нужно сделать в Quickhull, - это построить исходную оболочку, из которой можно начать пошагово добавлять точки.</div>
-<div class="caption"><img src="img/5.png" width=500></div>
+<div class="caption"><img src="img/5.png" width=400></div>
 Поиск этой исходной оболочки начнем с определения крайних точек по каждой из осей координат.
 <div class=blockindent>&nbsp; &#9679; &nbsp; Если по простому, то это означает, что нужно найти точки с наибольшими и наименьшими значениями координат&nbsp;<tt>x</tt>&nbsp;и&nbsp;<tt>y</tt>.</div>
-<div class="caption"><img src="img/6.png" width=700></div>
+<div class="caption"><img src="img/6.png" width=580></div>
 Из этих четырех точек выбираем пару, в которой точки находятся на самом большом расстоянии друг от друга.
 <div class=blockindent>&nbsp; &#9679; &nbsp; В данном примере это будут самая левая и самая правая точки.</div>
-<div class="caption"><img src="img/7.png" width=500></div>
+<div class="caption"><img src="img/7.png" width=400></div>
 Наконец, мы ищем самую дальнюю точку от линии, проведенной через эти две крайние точки
-<div class="caption"><img src="img/8.png" width=500></div>
+<div class="caption"><img src="img/8.png" width=400></div>
 Эти три точки и дадут нашу первоначальную оболочку.
 <div class=blockindent>&nbsp; &#9679; &nbsp; Первоначальная оболочка в двумерном пространстве - это просто треугольник.</div>
-<div class="caption"><img src="img/9.png" width=500></div><br>
+<div class="caption"><img src="img/9.png" width=400></div><br><br>
 
 <h3>Quickhull 2D: Разделение точек</h3>
 Прежде чем начать добавлять новые точки к исходной оболочке, нужно сделать некоторые бухгалтерские работы:
-Before we start adding new points to the initial hull we have to do some book-keeping work:
-
-<div class=blockindent>&nbsp; &#9679; &nbsp; Следующим шагом будет разделение оставшихся точек и присвоение каждой точки ближайшей к ней грани.
-The next step is to partition the remaining points and assign each point to its closest face</div>
-
+<div class=blockindent>&nbsp; &#9679; &nbsp; Следующим шагом будет разделение оставшихся точек и закрепление каждой точки за ближайшей к ней гранью.</div>
 <div class=blockindent>&nbsp; &#9679; &nbsp; Также можно удалить точки внутри исходной оболочки, поскольку они не могут быть на финальном варианте оболочки.</div>
-<div class="caption"><img src="img/10.png" width=800><br>
+<div class="caption"><img src="img/10.png" width=650><br>
 Пояснение к коду на картинке: <tt>CL</tt> - сокращ. англ. слов conflict list - список конфликтов, а <tt>CL(e1)={p1, p2, p3}</tt> означает, что список конфликтов грани <tt>e1</tt> содержит точки <tt>p1</tt>, <tt>p2</tt> и <tt>p3</tt>.</div><br>
 
 Это означает, что каждая грань ведет список точек, которые находятся вне плоскости грани. Эти списки называются «списками конфликтов», поскольку точки могут «видеть» эту грань и следовательно, возможно находятся на финальном варианте оболочки.
 Это грамотный способ управления вершинами, поскольку при добавлении к оболочке новой вершины не нужно перебирать все вершины.
 Поэтому <a href="https://ru.wikipedia.org/wiki/%D0%92%D1%80%D0%B5%D0%BC%D0%B5%D0%BD%D0%BD%D0%B0%D1%8F_%D1%81%D0%BB%D0%BE%D0%B6%D0%BD%D0%BE%D1%81%D1%82%D1%8C_%D0%B0%D0%BB%D0%B3%D0%BE%D1%80%D0%B8%D1%82%D0%BC%D0%B0" target="_blank">временна&#769;я сложность алгоритма</a>
 Quickhull обычно равна <span class="lnk" onmouseover="show('линейно-логарифмическое время,<br>максимально быстрая сортировка<br>сравнением')" onmouseout="hide()"><tt>O(n log n)</tt></span> как в двумерном, так и в трехмерном вариантах!
-<div class=warning><b>Предупреждение:</b> Пожалуйста не запутайтесь здесь. Так как алгоритм представлен в двух- и трехмерном вариантах и некоторая терминология совпадает, будем использовать термины «Edge» (ребро, край) и «Face» (грань) взаимозаменяемые! Это поможет, когда позже в этой лекции перейдем к трехмерному варианту алгоритма!
-
-Please don’t get confused here. Since I am presenting in 2D and 3D and some terminology overlaps I will use the terms ‘Edge’ and ‘Face’ interchangeable! This will usually help when we go to 3D later in the talk!</div><br>
+<div class=warning><b>Предупреждение:</b> Пожалуйста не запутайтесь здесь. Так как алгоритм представлен в двух- и трехмерном вариантах и некоторая терминология совпадает, будем использовать термины «Edge» (ребро, край) и «Face» (грань) как взаимозаменяемые! Это поможет, когда позже в этой лекции перейдем к трехмерному варианту алгоритма!</div>
+<div class=note_trans><b>Примечание переводчика:</b> В двумерном пространстве ребром будет простая линия, в отличие от трехмерного пространства, где ребро - это граница между двумя смежными гранями.<br>
+Двумерная грань - это часть плоскости между двумя ребрами-линиями, в трехмерном пространстве, грань - это плоскость между ребрами.</div><br><br>
 
 
 <h3>Quickhull 2D: Поиск следующей вершины</h3>
 Следующим шагом будет добавление новой точки к нашему промежуточному варианту оболочки. Перебираем наши списки конфликтов и находим точку <b>p</b> с наибольшим расстоянием от этой оболочки.
 <div class=blockindent>&nbsp; &#9679; &nbsp; Давайте назовем эту точку точкой просмотра или обзора.</div>
 <div class=blockindent>&nbsp; &#9679; &nbsp; Добавление этой новой точки потребует несколько дополнительных шагов.</div>
-<div class="caption"><img src="img/11.png" width=500></div><br>
+<div class="caption"><img src="img/11.png" width=400></div><br>
 
 <h3>Quickhull 2D: Поиск горизонта</h3>
-<div class="caption"><img src="img/12.png" width=700></div>
+<div class="caption"><img src="img/12.png" width=580></div>
 Сначала нам нужно определить все грани, которые видны из недавно добавленной точки, поскольку эти грани могут быть не на оболочке:
 First we need to identify all faces that are visible from the newly added point since these faces cannot be on the hull:
 
@@ -140,49 +134,36 @@ We can use simple plane tests to classify the new point against each face!</div>
 <div class=blockindent>&nbsp; &#9679; &nbsp; Фактически, горизонт является границей между видимой и невидимой частями текущей оболочки, как оно видится из новой точки просмотра.</div><br>
 
 <h3>Quickhull 2D: Добавление точки к оболочке</h3>
-После определения двух вершин горизонта, создадим две новые грани от каждой вершины горизонта для присоединения новой вершины к оболочке.
-Once we identified the two horizon vertices we then create two new faces for each horizon vertex to connect the new vertex to hull
-<div class="caption"><img src="img/13.png" width=500></div><br>
+После определения двух вершин горизонта, для присоединения новой вершины к оболочке создадим две новые грани от каждой вершины горизонта.
+<div class="caption"><img src="img/13.png" width=400></div><br><br>
 
 <!-- Page 19 -->
-<h3>Quickhull 2D: Partition orphans</h3>
-<div class="caption"><img src="img/14.png" width=800><br></div>
-После построения новых граней некоторые старые грани стали устаревшими.
-After building  the new faces some old faces became obsolete
-
-<div class=blockindent>&nbsp; &#9679; &nbsp; Прежде чем удалить эти грани, нужно обработать их списки конфликтов, поскольку эти конфликтные точки могут остаться на финальном варианте оболочки.
-Before we can delete these faces we need to handle their conflict lists since these conflict points can still be on the final hull</div>
-
-<div class=blockindent>&nbsp; &#9679; &nbsp; We handle this by simply partitioning these orphaned vertices to the new faces</div>
-
+<h3>Quickhull 2D: Переопределение "осиротевших" точек</h3>
+После построения новых граней некоторые старые грани стали ненужными.
+<div class=blockindent>&nbsp; &#9679; &nbsp; Прежде чем удалить эти грани, нужно обработать их списки конфликтов, поскольку конфликтные точки в этих списках могут оставаться на финальном варианте оболочки.</div>
+<div class=blockindent>&nbsp; &#9679; &nbsp; Обработка заключается в простом переопределении этих "осиротевших" вершин к новым граням.</div>
+<div class="caption"><img src="img/14.png" width=600></div><br><br>
 
 <!-- Page 20 -->
 <h3>Quickhull 2D: Добавление точки к оболочке</h3>
-<div class="caption"><img src="img/15.png" width=500><br>
-</div>
-Finally we can now remove all old faces which were visible from the new point and therefore cannot be on the hull anymore
-
-<div class=blockindent>&nbsp; &#9679; &nbsp; This closes the iteration and we repeat those steps until all conflict list are empty</div>
+Наконец, теперь можно удалить все старые грани, которые были видны из новой точки и, следовательно, больше не могут находиться на оболочке.
+<div class=blockindent>&nbsp; &#9679; &nbsp; На этом заканчивается данный цикл итераций и далее мы повторяем эти шаги до тех пор, пока не опустеют все списки конфликтов.</div>
 
 <div class=blockindent>&nbsp; &#9679; &nbsp; In our example we continue and grab the next eye point and add it to hull as we just learned</div>
-
+<div class="caption"><img src="img/15.png" width=400></div>
 
 <!-- Page 21 -->
-<div class="caption"><img src="img/16.png" width=500><br>
-</div>
-And we do it one more time to find our final hull…
-И делаем это ещё раз, чтобы найти нашу последнюю оболочку...
+И, чтобы найти наш финальный вариант оболочки, делаем это ещё раз ...
+<div class="caption"><img src="img/16.png" width=400></div>
 
 <!-- Page 22 -->
 <h3>Quickhull 2D:</h3>
-<div class="caption"><img src="img/17.png" width=500><br>
-</div>
-When there are no more vertices (which means all conflict lists are empty) we are done!<br><br>
+И вот, нет больше вершин (все списки конфликтов пусты) и все закончилось!
+<div class="caption"><img src="img/17.png" width=400></div><br><br>
 
 <!-- Page 23 -->
-As you can see the basic ideas should be pretty easy to understand
-
-<div class=blockindent>&nbsp; &#9679; &nbsp; In 3D the major implementation difficulties actually arise from managing the lists of vertices, edges, faces and conflicts</div>
+Как можно было видеть, все основные идеи были довольно просты для понимания.
+<div class=blockindent>&nbsp; &#9679; &nbsp; В 3D варианте алгоритма основные трудности реализации фактически возникают из-за управления списками вершин, ребер, граней и конфликтов.</div>
 
 <div class=blockindent>&nbsp; &#9679; &nbsp; The other difficulty is dealing with numerical imprecision when classifying  points using plane tests.</div>
 
@@ -879,15 +860,11 @@ Finally the face structure:
     Vertex = NextConflictVertex();
   }
 };</pre>
-Finally some high-level code examples to give you an idea of a possible
+Finally some high-level code examples to give you an idea of a possible implementation:
 
-implementation:
+<div class=blockindent>&nbsp; &#9679; &nbsp; Assume we have some qhConvex class to store the hull after construction</div>
 
--   Assume we have some qhConvex class to store the hull after construction
-
--   This snippet shows the top level construction function
-
-
+<div class=blockindent>&nbsp; &#9679; &nbsp; This snippet shows the top level construction function</div>
 
 Explain a bit…
 
@@ -904,43 +881,51 @@ Explain a bit…
 };</pre>
 The code snippets shows the iterative AddVertex() function
 
--   We add new points until our conflict lists are empty
+<div class=blockindent>&nbsp; &#9679; &nbsp; We add new points until our conflict lists are empty</div>
 
 Explain a bit…
 
 <!-- Page 114 -->
-So you want to implement Qhull yourself and I talked now for nearly an hour and
+So you want to implement Qhull yourself and I talked now for nearly an hour and there is no code!
 
-there is no code!
+<div class=blockindent>&nbsp; &#9679; &nbsp; Luckily there is a beautiful open-source implementation in JAVA which you can use to start</div>
 
--    Luckily there is a beautiful open-source implementation in JAVA which you can use
-
-    to start
-
--    I also recommend looking at the original Qhull implementation which is not only a great implementation, but also full of gems of computational geometry!!!
+<div class=blockindent>&nbsp; &#9679; &nbsp; I also recommend looking at the original Qhull implementation which is not only a great implementation, but also full of gems of computational geometry!!!</div>
 
 This closes the talk and hopefully my presentation will help you to understand and implement a robust convex hull builder!
 
-Thank you!
+Thank you!<br><br>
+
+<h3>Ссылки</h3>
+Описание алгоритма Quickhull:
+<div class=blockindent><a href="http://dpd.cs.princeton.edu/Papers/BarberDobkinHuhdanpaa.pdf" target="_blank">C. Barber/D. Dobkin: "The Quickhull Algorithm for Convex Hulls"</a><br>
+R. Seidel: "Small Dimensional Linear Programming and Convex Hulls Made Easy"<br>
+J. Smith: "Quickhull 3D"</div>
+Книги:
+<div class=blockindent>G. v. d. Bergen: "Collision Detection in Interactive 3D Environments"<br>
+C. Ericson: "Real-time Collision Detection"<br>
+J. O'Rourke: "Computational Geometry in C"<br>
+M. de Berg: "Computational Geometry"<br>
+E. Langetepe: "Geometric Data Structures for Computer Graphics"</div>
+Публикации на смежные темы:
+<div class=blockindent>G. Rhodes: "Computational Geometry" (Half-Edge Mesh)<br>
+M. McGuire: "The Half-Edge Data Structure" (Half-Edge Mesh)<br>
+D. Gordon: "Computing the Plane Equation of a Polygon" (Newell Plane)<br>
+E. Catto: "A Troublesome Triangle" (Newell Plane)<br>
+S. Melax: "Interaction with 3D Geometry" (StanHull)</div>
+Статьи о вычислениях с плавающей запятой:
+<div class=blockindent><a href="http://randomascii.wordpress.com/categorv/floating-point/" target="_blank">B. Dawson: http://randomascii.wordpress.com/categorv/floating-point/</a><br>
+<a href="http://realtimecollisiondetection.net/pubs/Tolerances/" target="_blank">C. Ericson: http://realtimecollisiondetection.net/pubs/Tolerances/</a></div>
+<br><br>
 
 <!-- Page 115 -->
 Before I close I like to thank a bunch of people!
-
--   Thanks to Valve for giving me permission to present to you today
-
--   Thanks to Paul, Steve, Jeff and Anoush for spending time and rehearse this presentation with me
-
--   Thanks to Randy for reading the presentation several times at an early stage and providing valuable feedback
-
--   Special thanks to Bruce Dawson for helping with the numerical problems in Quickhull and also providing all kinds of other valuable feedback
-
--   Special thanks to John Lloyd for sharing his beautiful JAVA Quickhull implementation and making it open source
-
-
-<!-- Page 117 -->
+<div class=blockindent>&nbsp; &#9679; &nbsp; Thanks to Valve for giving me permission to present to you today</div>
+<div class=blockindent>&nbsp; &#9679; &nbsp; Thanks to Paul, Steve, Jeff and Anoush for spending time and rehearse this presentation with me</div>
+<div class=blockindent>&nbsp; &#9679; &nbsp; Thanks to Randy for reading the presentation several times at an early stage and providing valuable feedback</div>
+<div class=blockindent>&nbsp; &#9679; &nbsp; Special thanks to Bruce Dawson for helping with the numerical problems in Quickhull and also providing all kinds of other valuable feedback</div>
+<div class=blockindent>&nbsp; &#9679; &nbsp; Special thanks to John Lloyd for sharing his beautiful JAVA Quickhull implementation and making it open source</div>
 If you liked this talk and if you want to see more cool Valve presentations please visit out website!
-
-
 
 <br><br>
 </body></html>
