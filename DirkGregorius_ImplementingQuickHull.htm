@@ -13,7 +13,7 @@
 <span style="font-size:70%; margin-left:20px;">Implementing&nbsp;QuickHull</span></h1><br><br>
 Добрый день! Меня зовут Дирк, и я инженер-программист в Valve.<br><br>
 Некоторые из вас возможно заметили, что я изменил заголовок своей лекции на: "Реализация алгоритма выпуклой оболочки".<br>
-Когда я пересказывал эту лекция в Valve, одним из вопросов был: "Почему презентация о выпуклой оболочке? Разве это не хорошо понимаемый алгоритм?"<br>
+Когда я пересказывал эту лекция в Valve, одним из вопросов был: "Почему презентация об алгоритме выпуклой оболочки? Разве это не хорошо понимаемый алгоритм?"<br>
 На мой взгляд это отчасти верно. Можно найти несколько презентаций об основах теории выпуклой оболочки и аналитических статей некоторой сложности, но вряд ли
 это все имело отношение к реализации данного алгоритма.
 Особенно в производственной среде, где приходится иметь дело со всеми видами недостаточно определенной входной геометрией!
@@ -121,8 +121,7 @@ Quickhull обычно равна <span class="lnk" onmouseover="show('лине�
 
 <h3>Quickhull 2D: Поиск горизонта</h3>
 <div class="caption"><img src="img/12.png" width=580></div>
-Сначала нам нужно определить все грани, которые видны из недавно добавленной точки, поскольку эти грани могут быть не на оболочке:
-First we need to identify all faces that are visible from the newly added point since these faces cannot be on the hull:
+Сначала нам нужно определить все грани, которые видны из недавно добавленной точки, поскольку эти грани могут находиться не на оболочке:
 
 <div class=blockindent>&nbsp; &#9679; &nbsp; Грань является видимой, если эта новая точка находится перед плоскостью грани. A face is visible if the new point is in front of the face plane.</div>
 
@@ -149,7 +148,8 @@ We can use simple plane tests to classify the new point against each face!</div>
 Наконец, теперь можно удалить все старые грани, которые были видны из новой точки и, следовательно, больше не могут находиться на оболочке.
 <div class=blockindent>&nbsp; &#9679; &nbsp; На этом заканчивается данный цикл итераций и далее мы повторяем эти шаги до тех пор, пока не опустеют все списки конфликтов.</div>
 
-<div class=blockindent>&nbsp; &#9679; &nbsp; In our example we continue and grab the next eye point and add it to hull as we just learned</div>
+<div class=blockindent>&nbsp; &#9679; &nbsp; В нашем примере действие продолжается и захватывается следующая точка просмотра и добавляется к оболочке точно также, как мы только что узнали.
+In our example we continue and grab the next eye point and add it to hull as we just learned</div>
 <div class="caption"><img src="img/15.png" width=400></div>
 
 <!-- Page 21 -->
@@ -164,20 +164,21 @@ We can use simple plane tests to classify the new point against each face!</div>
 <!-- Page 23 -->
 Как можно было видеть, все основные идеи были довольно просты для понимания.
 <div class=blockindent>&nbsp; &#9679; &nbsp; В 3D варианте алгоритма основные трудности реализации фактически возникают из-за управления списками вершин, ребер, граней и конфликтов.</div>
-
-<div class=blockindent>&nbsp; &#9679; &nbsp; The other difficulty is dealing with numerical imprecision when classifying  points using plane tests.</div>
+<div class=blockindent>&nbsp; &#9679; &nbsp; Другая сложность связана с неточностью в вычислениях при классификации точек с использованием проверок плоскости.</div>
 
 <!-- Page 24 -->
+До сих пор мы делали вид, что наши математические операции точны.
 So far we pretended that our mathematical operations are exact
 
-<div class=blockindent>&nbsp; &#9679; &nbsp; Of course this is *not* true in floating point arithmetic.</div>
+<div class=blockindent>&nbsp; &#9679; &nbsp; Конечно, это * не * верно в арифметике с плавающей запятой.
+Of course this is *not* true in floating point arithmetic.</div>
 
-<div class=blockindent>&nbsp; &#9679; &nbsp; Let’s investigate how we can deal with those problems.</div><br><br>
+<div class=blockindent>&nbsp; &#9679; &nbsp; Давайте расследуем, как можно справиться с этими проблемами.
+Let’s investigate how we can deal with those problems.</div><br><br>
 
 <!-- Page 25 -->
 <h3>Quickhull 2D: Инварианты</h3>
 <div class=note_trans><b>Примечание переводчика:</b> Инвариант — это свойство некоторого класса (множества) математических объектов, остающееся неизменным при преобразованиях определённого типа. В топологии — это величина, определённая для каждого узла и одинаковая для эквивалентных узлов.</div>
-
 При построении выпуклой оболочки следует придерживаться геометрических инвариантов.
 <div class=blockindent>&nbsp; &#9679; &nbsp; В двумерном варианте алгоритма должна быть обеспечена выпуклость каждой вершины.</div>
 <div class=blockindent>&nbsp; &#9679; &nbsp; Это должно быть очевидно, так как в противном случае было бы легко найти прямую между двумя точками внутри оболочки, которая бы выходила из нее и вновь входила, как показано на рисунке в начале статьи.</div>
@@ -195,62 +196,56 @@ So far we pretended that our mathematical operations are exact
 
 <!-- Page 27 -->
 <h3>Quickhull 2D: Надежность вычислений</h3>
+Теперь давайте рассмотрим пример, в котором невыпуклые вершины могут стать проблемой:
+<div class=blockindent>&nbsp; &#9679; &nbsp; Всякий раз, когда добавляется точка, которая находится на одной линии с существующей гранью (т.е. <a href="https://ru.wikipedia.org/wiki/%D0%9A%D0%BE%D0%BB%D0%BB%D0%B8%D0%BD%D0%B5%D0%B0%D1%80%D0%BD%D0%BE%D1%81%D1%82%D1%8C" target="_blank">колинеарна</a>), некоторые вещи могут стать неопределенными.</div>
+<div class=blockindent>&nbsp; &#9679; &nbsp; Небольшое изменение точки <tt>P</tt> будет определять, останется ли вершина <tt>V</tt> на оболочке или нет.</div>
+<div class=blockindent>&nbsp; &#9679; &nbsp; В идеале хотелось бы иметь более стабильную ситуацию, так чтобы при очень небольших изменениях в пределах некоторого допуска получался бы одинаковый результат.</div>
+<div class=blockindent>&nbsp; &#9679; &nbsp; Заметим, что точка <tt>P</tt> на самом деле не движется, но может оказаться по обе стороны от плоскости <b>просто</b> из-за неточности в вычислениях.</div>
 <div class="caption"><img src="img/20.png" width=600><br>
-coplanar - копланарный, т.е. находящийся в одной плоскости, concave - вогнутый, convex - выпуклый</div>
-Let’s now look at an example where non-convex vertices might become an issue:
-
-<div class=blockindent>&nbsp; &#9679; &nbsp; Whenever we add a point which is collinear with an existing face things can become fuzzy</div>
-
-<div class=blockindent>&nbsp; &#9679; &nbsp; A small variation of point P will define whether the vertex V will remain on the hull or not</div>
-
-<div class=blockindent>&nbsp; &#9679; &nbsp; Ideally we would like to have more stability such that for very small  variations within some tolerance we would get the same result</div>
-
-<div class=blockindent>&nbsp; &#9679; &nbsp; Note that the point P is not actually moving, but can end up on either side of the plane *just* due  to numerical imprecision</div>
+coplanar - копланарный, т.е. находящийся в одной плоскости, concave - вогнутый, convex - выпуклый</div><br><br>
 
 <!-- Page 28 -->
-<h3>Quickhull 2D: Толщина плоскостей Fat planes</h3>
+<h3>Quickhull 2D: "Толстые" плоскости</h3>
+Общим подходом к решению таких типовых задач является использование так называемых <b>толстых</b> плоскостей.
+<div class=blockindent>&nbsp; &#9679; &nbsp; Вместо сравнения непосредственно с нулем мы теперь сравниваем с некоторым значением эпсилон (&#949;).</div>
+По-прежнему можно распределять точки при использовании "толстых" плоскостей, как и раньше:
+<div class=blockindent>&nbsp; &#9679; &nbsp; Точка находится перед плоскостью, если расстояние между этой точкой и плоскостью больше значения эпсилон.</div>
+<div class=blockindent>&nbsp; &#9679; &nbsp; Точка находится позади плоскости, если расстояние между этой точкой и плоскостью меньше отрицательного значения эпсилон.</div>
+<div class=blockindent>&nbsp; &#9679; &nbsp; Во всех остальных случаях точка должна быть на плоскости.</div>
 <div class="caption"><img src="img/21.png" width=600><br>
-in front of plane - перед плоскостью, behind plane - за плоскостью, on plane - на плоскости</div>
-A common approach to deal with these kinds of numerical problems is to use so called *fat* planes
-
-<div class=blockindent>&nbsp; &#9679; &nbsp; Instead of comparing directly against zero we now compare against some epsilon value</div>
-
-
-We still can classify points when using fat planes as before:
-
-<div class=blockindent>&nbsp; &#9679; &nbsp; A point is in front of the plane if its distance is larger than epsilon</div>
-
-<div class=blockindent>&nbsp; &#9679; &nbsp; A point is behind the plane if the distance is less than negative epsilon</div>
-
-<div class=blockindent>&nbsp; &#9679; &nbsp; Otherwise the point must on the plane.</div>
-
-<b>We can now define a vertex to be convex if its distance is larger than epsilon. All other points are either concave or coplanar and should be handled specially!</b><br><br>
+in front of plane - перед плоскостью, behind plane - за плоскостью, on plane - на плоскости</div><br>
+<b>Теперь можно устанавливать что вершина является выпуклой, если расстояние между ней и плоскостью больше значения эпсилон. Все остальные точки являются либо вогнутыми, либо копланарными и должны обрабатываться отдельно!</b><br><br>
 
 <!-- Page 29 -->
-<h3>Quickhull 2D: Объединение граней Face merging</h3>
-<div class="caption"><img src="img/22.png" width=500><br>non-convex - невыпуклая, merged - объединенные</div>
-So what do we do when we encounter a non-convex vertex?
-
-<div class=blockindent>&nbsp; &#9679; &nbsp; The rule is essentially that we want every vertex of our hull to be clearly convex</div>
-
-<div class=blockindent>&nbsp; &#9679; &nbsp; We can enforce this rule by simply merging the left and right face across the non-convex vertex into a new face.</div>
-
-<div class=blockindent>&nbsp; &#9679; &nbsp; As you can see on the slide his will remove the concavity and correct the geometrical defect.</div>
+<h3>Quickhull 2D: Объединение граней</h3>
+Итак, что делать, при встрече с невыпуклой вершиной?
+<div class=blockindent>&nbsp; &#9679; &nbsp; Правило состоит в том, чтобы каждая вершина нашей оболочки была однозначно выпуклой.</div>
+<div class=blockindent>&nbsp; &#9679; &nbsp; Можно применять это правило, просто объединяя левую и правую грань через невыпуклую вершину в новую грань.</div>
+<div class=blockindent>&nbsp; &#9679; &nbsp; Как можно видеть на рисунке, при этом удаляется вогнутость и исправляется геометрический дефект.</div>
+<div class="caption"><img src="img/22.png" width=500><br>non-convex - невыпуклая, merged - объединенная</div><br><br>
 
 <!-- Page 30 -->
 <h3>Quickhull 2D: Epsilon</h3>
 <div class="caption"><img src="img/23.png" width=400></div>
-The final question is what epsilon we should choose for our fat planes:
+Последний вопрос: какое значение эпсилон следует выбрать для наших "толстых" плоскостей:
 
-<div class=blockindent>&nbsp; &#9679; &nbsp; The CRT defines a floating point epsilon but this does NOT take our input set into account.</div>
+<div class=blockindent>&nbsp; &#9679; &nbsp; CRT определяет epsilon с плавающей запятой, но это НЕ учитывает наш входной набор.
+The CRT defines a floating point epsilon but this does NOT take our input set into account.</div>
 
-<div class=blockindent>&nbsp; &#9679; &nbsp; We like to define a relative tolerance which takes the size of the input object into account</div>
+<div class=blockindent>&nbsp; &#9679; &nbsp; Хотелось бы определять относительный допуск принимая во внимание размер входного объекта.</div>
 
-<div class=blockindent>&nbsp; &#9679; &nbsp; So one possible solution it to choose an epsilon relative to the sum of maximum absolute coordinates</div>
+<div class=blockindent>&nbsp; &#9679; &nbsp; Таким образом, одно из возможных решений - выбрать значение эпсилон исходя из суммы максимальных абсолютных координат.
+So one possible solution it to choose an epsilon relative to the sum of maximum absolute coordinates</div>
 
-<div class=blockindent>&nbsp; &#9679; &nbsp; Note that when using FLT_EPSILON without scaling we would fail big time e.g. very small models (where FLT_EPSILON is much bigger than the entire model itself)</div>
+<div class=blockindent>&nbsp; &#9679; &nbsp; Обратите внимание, что при использовании FLT_EPSILON без масштабирования мы потерпим неудачу, например, очень маленькие модели (где FLT_EPSILON намного больше, чем сама модель).
+Note that when using FLT_EPSILON without scaling we would fail big time e.g. very small models (where FLT_EPSILON is much bigger than the entire model itself)</div>
+<!-- FLT_EPSILON	1.192092896e-07F	Наименьшее число такое, что 1.0+FLT_EPSILON !=1.0
+Разница между единицей и наименьшим значением, большим единицы, которую можно представить в виде числа с плавающей запятой.
+https://ru.wikipedia.org/wiki/%D0%9C%D0%B0%D1%88%D0%B8%D0%BD%D0%BD%D1%8B%D0%B9_%D0%BD%D0%BE%D0%BB%D1%8C    машинный ноль
+https://developer.mozilla.org/ru/docs/Web/JavaScript/Reference/Global_Objects/Number/EPSILON -->
 
-<div class=blockindent>&nbsp; &#9679; &nbsp; Or for very large models where the epsilon is too small to make any difference at all</div><br><br>
+<div class=blockindent>&nbsp; &#9679; &nbsp; Или для очень больших моделей, когда значение эпсилон слишком мало, чтобы иметь вообще какое-либо значение.
+Or for very large models where the epsilon is too small to make any difference at all</div><br><br>
 
 
 <!-- Page 31 -->
