@@ -535,7 +535,7 @@ The Newell algorithm builds a best fit plane in the least square sense which min
 <!-- Page 97 -->
 Для удобства и завершенности здесь добавлено несколько формул, но переход на подробности несколько отвлечет нас от темы.
 <div class=blockindent>&nbsp; &#9679; &nbsp; Книги от <a href="https://www.amazon.com/Collision-Detection-Interactive-Environments-Technology/dp/155860801X" target="_blank">Gino Van Den Bergen</a>
-и <a href="http://realtimecollisiondetection.net/books/rtcd/" target="_blank">Christer Ericson</a> охватывают плоскости Ньювелла, а также в список <a href="#ref">литературы, рекомендуемой к прочтению,</a> добавлены дополнительные ссылки</div>
+и <a href="http://realtimecollisiondetection.net/books/rtcd/" target="_blank">Christer Ericson</a> охватывают плоскости Ньюелла, а также в список <a href="#ref">литературы, рекомендуемой к прочтению,</a> добавлены дополнительные ссылки</div>
 <div class="caption"><img src="img/86.png" width=250></div><br><br>
 
 <!-- Page 98 --><img src="img/87.png" width=200 align=right>
@@ -564,13 +564,11 @@ The Newell algorithm builds a best fit plane in the least square sense which min
 <div class="caption"><img src="img/89.png" width=600></div>
 Данная ошибка обнаруживается с помощью проверки смежных граней для входного (<b>e<sub>in</sub></b>) и выходного (<b>e<sub>out</sub></b>) ребер -><br>
 Оба ребра указывают на <b>face2</b>.
-<div class=blockindent>&nbsp; &#9679; &nbsp; Поскольку face2 - это треугольник, мы не будем соединять входное (<b>e<sub>in</sub></b>) и выходное (<b>e<sub>out</sub></b>) ребра, но взамен будем использовать не общий ребро.
+<div class=blockindent>&nbsp; &#9679; &nbsp; Поскольку <b>face2</b> - это треугольник, мы не будем соединять входное (<b>e<sub>in</sub></b>) и выходное (<b>e<sub>out</sub></b>) ребра, но взамен будем использовать ребро, не используемое совместно.
 Since face2 is a triangle we will not connect the in- and outgoing edge, but use the non-shared edge instead</div>
 
-<div class=blockindent>&nbsp; &#9679; &nbsp; Обратите внимание, что грань <b>face2</b> также избыточна, так как все вершины содержатся в <b>face13</b>, и может быть удалена.
-Note that face2 is redundant as well since all vertices are contained in face13 and can be deleted</div>
-
-<div class=blockindent>&nbsp; &#9679; &nbsp; Кроме того вершина <b>v</b> стала ненужной и также будет удалена.</div>
+<div class=blockindent>&nbsp; &#9679; &nbsp; Обратите внимание, что грань <b>face2</b> стала избыточной, так как все вершины содержатся в <b>face13</b>, и может быть удалена.</div>
+<div class=blockindent>&nbsp; &#9679; &nbsp; Кроме того, и вершина <b>v</b> стала ненужной, и также будет удалена.</div>
 Трюк здесь в том, что при объединении двух граней, мы делаем проверку на появление этой ошибки и, если она существует, сразу же её исправляем!<br>
 
 <!-- Page 101 -->
@@ -584,113 +582,109 @@ Note that face2 is redundant as well since all vertices are contained in face13 
 
 <!-- Page 102 -->
 <div class="caption"><img src="img/91.png" width=600></div>
-We detect this error again by checking the adjacent faces of the in- and outgoing
-
-edges -> Both edges point to face3 here
+We detect this error again by checking the adjacent faces of the in- and outgoing edges -> Здесь оба ребра указывают на грань <b>face3</b>.
 
 <div class=blockindent>&nbsp; &#9679; &nbsp; Since face3 has now more than three vertices we cannot apply the same fixing strategy as before</div>
 
 <div class=blockindent>&nbsp; &#9679; &nbsp; Instead we simply extend the incoming edge to the next vertex and delete the outgoing edge</div>
 
 <div class=blockindent>&nbsp; &#9679; &nbsp; Again vertex v has become obsolete and should be deleted as well</div>
-
-Again when we merge faces we check for this error and fix it immediately!
+Снова, при объединении двух граней делаем проверку на появление этой ошибки и, если она существует, сразу же её исправляем!
 
 <!-- Page 103 -->
 <h3>Большие циклы объединения</h3>
+Другая проблема, с которой можно столкнуться при объединении граней, состоит в том, что может быть добавлено большое количество новых граней, которые нужно объединить:
+<div class=blockindent>&nbsp; &#9679; &nbsp; Давайте назовем это циклом слияния (merge cycle).</div>
 <div class="caption"><img src="img/92.png" width=800></div>
-Another problem you will encounter when merging faces is that you might a large number of new faces that should be all merged:
-
-<div class=blockindent>&nbsp; &#9679; &nbsp; Let’s call this a merge cycle</div>
-
-Imagine we are building the convex of hull of a cylinder and we are about to add the final vertex of the top face:
-
-<div class=blockindent>&nbsp; &#9679; &nbsp; This vertex of course presents itself as in the same plane as the other vertices.</div>
-
-<div class=blockindent>&nbsp; &#9679; &nbsp; In this situation we create many new faces which are roughly coplanar and need to be merged</div>
-
-<div class=blockindent>&nbsp; &#9679; &nbsp; Ideally we would like to merge all new faces into one face as shown on the right hand side</div>
+Представьте себе, что мы создаем выпуклую оболочку цилиндра, и собираемся добавить последнюю вершину верхней грани:
+<div class=blockindent>&nbsp; &#9679; &nbsp; Разумеется, эта вершина находится в той же плоскости, что и другие вершины.</div>
+<div class=blockindent>&nbsp; &#9679; &nbsp; В этой ситуации мы создаем много новых граней, которые примерно копланарны и должны быть объединены.</div>
+<div class=blockindent>&nbsp; &#9679; &nbsp; В идеале хотелось бы объединить все новые грани в одну, как показано на рисунке справа.</div>
 
 <!-- Page 104 -->
 <div class="caption"><img src="img/93.png" width=400></div>
+Проблема в том, что практически "сливается" одна грань за другой:
 The problem is now that we practically merge one face after the other:
 
-<div class=blockindent>&nbsp; &#9679; &nbsp; Whenever we merge two faces we rebuild the face plane.</div>
+<div class=blockindent>&nbsp; &#9679; &nbsp; Всякий раз, при объединении двух граней, перестраивается плоскость грани.</div>
+<div class=blockindent>&nbsp; &#9679; &nbsp; Перестроение грани может смещать плоскость и ребро между двумя гранями может временно стать выпуклым и не позволит нам объединить весь круг целиком.</div>
 
-<div class=blockindent>&nbsp; &#9679; &nbsp; Rebuilding the face can jiggle the plane and an edge between two faces can become temporarily convex and prevent us from merging the whole cycle</div>
+<div class=blockindent>&nbsp; &#9679; &nbsp; В наихудшем случае это может привести к вогнутым граням, которые теперь должным образом <b>НЕ</b> объединены.
+In the worst case this can introduce concave faces which are now NOT merged properly</div>
 
-<div class=blockindent>&nbsp; &#9679; &nbsp; In the worst case this can introduce concave faces which are now NOT merged properly</div>
-
-
-
-Here are some ideas how to address this:
-
-<div class=blockindent>&nbsp; &#9679; &nbsp; The faces with the largest area should be the most stable w.r.t. the orientation of the face plane. So merging into the largest faces first reduces jiggle. Think of merging the little sister into the big daddy</div>
-
-<div class=blockindent>&nbsp; &#9679; &nbsp; You can also introduce an absolute tolerance to increase your merge radius and make your merge cycle less sensitive for these situations.</div>
-
-<div class=blockindent>&nbsp; &#9679; &nbsp; This is basically how I handle this problem at the moment since for physics we want as large faces as possible for stability reasons and do not aim for the tightest hull.</div>
-
-<div class=blockindent>&nbsp; &#9679; &nbsp; If you are working with collision margins it is probably a good idea to make this absolute tolerance a small percentage of that margin</div>
-
+Вот несколько идей по решению этой проблемы:
+<div class=blockindent>&nbsp; &#9679; &nbsp; Грани с наибольшей площадью должны быть наиболее устойчивыми по отношению к ориентации плоскости грани. Таким образом, первоочередное слияние в самые большие грани уменьшает смещение.</div>
+<div class=blockindent>&nbsp; &#9679; &nbsp; Можно также ввести абсолютное допустимое отклонение для увеличения предела слияния и сделать цикл слияния менее чувствительным для этих ситуаций.</div>
+Это в основном то, как я справляюсь с этой проблемой на данный момент, поскольку для физики желательны грани как можно большего размера по соображениям стабильности и нет стремления к наиболее плотно прилегающей оболочке.<br>
+Если ведется работа с полями столкновений, то вероятно неплохо сделать это абсолютное допустимое отклонение небольшим процентом от этого поля.<br><br>
 
 <!-- Page 105 -->
-<div class="caption"><img src="img/94.png" width=600><br>face plane - плоскость грани</div><br>
-Еще одна идея для решения этой проблемы - при объединении граней вообще НЕ перестраивать плоскости граней:
+Еще одна идея для решения этой проблемы - при объединении граней вообще <b>НЕ</b> перестраивать плоскости граней:
 Another idea to deal with this problem is to NOT rebuild the face planes at all when merging to faces:
+<div class="caption"><img src="img/94.png" width=600><br>face plane - плоскость грани</div>
+<div class=blockindent>&nbsp; &#9679; &nbsp; Для обеих граней у вас есть наиболее подходящая плоскость и вершины (которые я и попытался изобразить на рисунке).</div>
 
-<div class=blockindent>&nbsp; &#9679; &nbsp; For both faces you have your best fit plane and the vertices (which I tried to sketch on the slide)</div>
+<div class=blockindent>&nbsp; &#9679; &nbsp; Теперь можно вычислить абсолютное расстояние вершин правой грани до плоскости левой грани и наоборот.
+We can now compute the absolute distance of the right face’s vertices to the left face’s plane and vice versa</div>
 
-<div class=blockindent>&nbsp; &#9679; &nbsp; We can now compute the absolute distance of the right face’s vertices to the left face’s plane and vice versa</div>
-
-<div class=blockindent>&nbsp; &#9679; &nbsp; Then we simply keep the face plane that minimizes the distance instead of rebuilding it</div>
+<div class=blockindent>&nbsp; &#9679; &nbsp; Затем просто сохраняем плоскость грани, которая минимизирует расстояние, вместо её перестраивания.
+Then we simply keep the face plane that minimizes the distance instead of rebuilding it</div>
 
 <!-- Page 106 -->
+Давайте закончим эту часть, о том как можно использовать слияние граней для борьбы с дефектными оболочками:
 Let’s close this part how we could use face merging to deal with defect hulls:
 
-<div class=blockindent>&nbsp; &#9679; &nbsp; At each iteration the basic assumption is to start with a healthy hull</div>
+<div class=blockindent>&nbsp; &#9679; &nbsp; На каждой итерации основное предположение состоит в том, чтобы начать с исправной оболочки.
+At each iteration the basic assumption is to start with a healthy hull</div>
 
-<div class=blockindent>&nbsp; &#9679; &nbsp; When adding the vertex we need to inspect all new faces for possible defects at their edges between each other and at the horizon</div>
+<div class=blockindent>&nbsp; &#9679; &nbsp; При добавлении вершины необходимо проверить все новые грани на наличие возможных дефектов на ребрах между ними и на горизонте.
+When adding the vertex we need to inspect all new faces for possible defects at their edges between each other and at the horizon</div>
 
-<div class=blockindent>&nbsp; &#9679; &nbsp; These are the weak spots where might have introduced new errors</div>
+<div class=blockindent>&nbsp; &#9679; &nbsp; Это слабые места, где могут возникнуть новые ошибки.
+These are the weak spots where might have introduced new errors</div>
 
-<div class=blockindent>&nbsp; &#9679; &nbsp; An easy strategy is to iterate all new faces and repair each edge one by one</div>
+<div class=blockindent>&nbsp; &#9679; &nbsp; Простая стратегия состоит в переборе всех новых граней и поочередном исправлении каждого ребра, одного за другим.
+An easy strategy is to iterate all new faces and repair each edge one by one</div><br><br>
 
 <!-- Page 107 -->
-This closes the theory and in the remainder of this talk I like to share some quick tips about a possible implementation
+Это закрывает теорию, и в оставшейся части этого разговора я хотел бы поделиться некоторыми быстрыми советами о возможной реализации
+This closes the theory and in the remainder of this talk I like to share some quick tips about a possible implementation<br><br>
 
 <!-- Page 108 -->
+Основной ловушкой для производительности является плохое управление памятью полуреберной структуры данных:
 The major performance pitfall is bad memory management of the half-edge data structure:
 
-<div class=blockindent>&nbsp; &#9679; &nbsp; The convex hull for N vertices is bounded</div>
+<div class=blockindent>&nbsp; &#9679; &nbsp; Выпуклая оболочка для <b>N</b> вершин ограничена
+The convex hull for N vertices is bounded</div>
 
-<div class=blockindent>&nbsp; &#9679; &nbsp; Worst case is that all input vertices are on the hull:</div>
+<div class=blockindent>&nbsp; &#9679; &nbsp; Наихудшим случаем является тот, у которого все входные вершины находятся на оболочке: Worst case is that all input vertices are on the hull:</div>
 
-<div class=blockindent>&nbsp; &#9679; &nbsp; The number of vertices is then at most V = N</div>
+<div class=blockindent>&nbsp; &#9679; &nbsp; Число вершин тогда не более V = N. The number of vertices is then at most V = N</div>
 
-<div class=blockindent>&nbsp; &#9679; &nbsp; The number of edges is then at most E = 3N – 6</div>
+<div class=blockindent>&nbsp; &#9679; &nbsp; Число ребер тогда не более E = 3N - 6. The number of edges is then at most E = 3N – 6</div>
 
-<div class=blockindent>&nbsp; &#9679; &nbsp; The number of faces is then at most F = 2N – 4</div>
+<div class=blockindent>&nbsp; &#9679; &nbsp; Число граней тогда не более F = 2N - 4. The number of faces is then at most F = 2N – 4</div>
 
-<div class=blockindent>&nbsp; &#9679; &nbsp; Test with Euler’s formula: V –  E + F = 2</div>
+<div class=blockindent>&nbsp; &#9679; &nbsp; Проверка по формуле Эйлера: V - E + F = 2. Test with Euler’s formula: V –  E + F = 2</div><br><br>
 
 
-
+В нашей реализации можно предварительно выделить один буфер для вершин, полуребер и граней и управлять этим буфером в свободном списке.
 In our implementation we can pre-allocate one buffer for vertices, half-edges, and faces and manage this buffer in a free list
 
-<div class=blockindent>&nbsp; &#9679; &nbsp; Ideally we will just have one big allocation per hull construction!</div>
+<div class=blockindent>&nbsp; &#9679; &nbsp; В идеале у нас будет только одно большое назначение на конструкцию оболочки! Ideally we will just have one big allocation per hull construction!</div>
 
-<div class=blockindent>&nbsp; &#9679; &nbsp; This becomes especially important if you plan to compute convex hulls at runtime (e.g. for destruction)</div>
+<div class=blockindent>&nbsp; &#9679; &nbsp; Это становится особенно важным, если планируется вычислять выпуклые оболочки во время выполнения (например, для разрушения).
+This becomes especially important if you plan to compute convex hulls at runtime (e.g. for destruction)</div><br><br>
 
-
-
+Вот некоторые практические детали:
 Here are some practical details:
+<div class=blockindent>&nbsp; &#9679; &nbsp; Не забывайте, что нужно назначать полуребра (которых вдвое больше, чем ребер).
+Don’t forget that you need to allocate half-edges (which is twice the number of edges)</div>
 
-<div class=blockindent>&nbsp; &#9679; &nbsp; Don’t forget that you need to allocate half-edges (which is twice the number of edges)</div>
+<div class=blockindent>&nbsp; &#9679; &nbsp; Также необходимо учитывать временные назначения (например, грани горизонта).
+We also need to account for temporary allocations (e.g. horizon faces)</div>
 
-<div class=blockindent>&nbsp; &#9679; &nbsp; We also need to account for temporary allocations (e.g. horizon faces)</div>
-
-<div class=blockindent>&nbsp; &#9679; &nbsp; In practice I just double the buffer size</div>
+<div class=blockindent>&nbsp; &#9679; &nbsp; На практике я просто удваиваю размер буфера. In practice I just double the buffer size</div>
 
 <!-- Page 109 -->
 <h3>Реализация: полуреберная сетка</h3>
@@ -702,19 +696,19 @@ Here are some practical details:
   qhHalfEdge* Edge;<br>
   qhVector3 Position;
 };</pre>
-Let’s start with the vertex structure.
+Давайте начнем со структуры вершин.
+<div class=blockindent>&nbsp; &#9679; &nbsp; Для хранения вершин я пользуюсь <a href="https://ru.wikipedia.org/wiki/%D0%98%D0%BD%D1%82%D1%80%D1%83%D0%B7%D0%B8%D0%B2%D0%BD%D1%8B%D0%B9_%D1%81%D0%BF%D0%B8%D1%81%D0%BE%D0%BA" target="_blank" onmouseover="show('Интрузивный список — это такой список, в котором каждый элемент<br>содержит ссылки на соседей. Другими словами, элементы в таком<br>списке «имеют представление» о том, что находятся в списке и своем<br>положении в нем, тогда как в обычном списке данные и информация<br>о соседних элементах изолированы друг от друга.')" onmouseout="hide()">интрузивным списком</a>.</div>
+<div class=blockindent>&nbsp; &#9679; &nbsp; Вершины находятся либо на оболочке, либо в списке конфликтов.</div>
 
-<div class=blockindent>&nbsp; &#9679; &nbsp; I am using an intrusive list to store the vertices</div>
+<div class=blockindent>&nbsp; &#9679; &nbsp; Поэтому, естественно, мы должны включить сюда указатели списка. So obviously we have to include the list pointers here.</div>
 
-<div class=blockindent>&nbsp; &#9679; &nbsp; The vertices are either on the hull or in a conflict list</div>
+<div class=blockindent>&nbsp; &#9679; &nbsp; При желании можно также сохранить ребро, оставляющее вершину.
+We can optionally also store an edge leaving the vertex.</div>
 
-<div class=blockindent>&nbsp; &#9679; &nbsp; So obviously we have to include the list pointers here.</div>
+<div class=blockindent>&nbsp; &#9679; &nbsp; Это не требуется для построения оболочки, но может быть полезно для последующей обработки, если вам понадобится, например, для итерации всех смежных граней вершины.
+This is not needed for constructing the hull, but it can be useful for post-processing if you like e.g. to iterate all adjacent faces of the vertex</div>
 
-<div class=blockindent>&nbsp; &#9679; &nbsp; We can optionally also store an edge leaving the vertex.</div>
-
-<div class=blockindent>&nbsp; &#9679; &nbsp; This is not needed for constructing the hull, but it can be useful for post-processing if you like e.g. to iterate all adjacent faces of the vertex</div>
-
-<div class=blockindent>&nbsp; &#9679; &nbsp; Of course we also to need store the position of a vertex</div>
+<div class=blockindent>&nbsp; &#9679; &nbsp; Конечно, также нужно сохранять положение вершины.</div>
 
 <!-- Page 110 -->
 <pre>struct qhHalfEdge
@@ -725,17 +719,19 @@ Let’s start with the vertex structure.
   qhHalfEdge* Twin;<br>
   qhFace* Face;
 };</pre>
+Теперь давайте глянем, как можно реализовать полуребро:
 Now let’s have a quick look how we can potentially implement a half-edge:
 
-<div class=blockindent>&nbsp; &#9679; &nbsp; As we would expect this definition maps pretty directly to a possible data structure</div>
+<div class=blockindent>&nbsp; &#9679; &nbsp; Как и следовало ожидать, это определение непосредственно сопоставляется с возможной структурой данных.
+As we would expect this definition maps pretty directly to a possible data structure</div>
 
-<div class=blockindent>&nbsp; &#9679; &nbsp; We store a pointer to the tail vertex of the edge</div>
+<div class=blockindent>&nbsp; &#9679; &nbsp; Мы сохраняем указатель на хвостовую вершину ребра.</div>
 
-<div class=blockindent>&nbsp; &#9679; &nbsp; The half-edges build a circular list around the face so we also need to store the list pointers here</div>
+<div class=blockindent>&nbsp; &#9679; &nbsp; Полуребра создают круговой список вокруг грани, поэтому здесь также нужно сохранить указатели списка.
+The half-edges build a circular list around the face so we also need to store the list pointers here</div>
 
-<div class=blockindent>&nbsp; &#9679; &nbsp; And of course we also store the twin edge to cross over to the adjacent face</div>
-
-<div class=blockindent>&nbsp; &#9679; &nbsp; Finally we also keep a reference to the parent face of the edge</div>
+<div class=blockindent>&nbsp; &#9679; &nbsp; И, конечно же, также сохраняем ребро-двойник, для перехода к соседней грани.</div>
+<div class=blockindent>&nbsp; &#9679; &nbsp; Наконец, также сохраняем ссылку на родительскую грань ребра.</div>
 
 
 <!-- Page 111 -->
@@ -746,7 +742,7 @@ Now let’s have a quick look how we can potentially implement a half-edge:
   qhHalfEdge* Edge;
   qhList&lt; qhVertex > ConflictList;
 };</pre>
-Finally the face structure:
+Наконец, структура граней:
 
 <div class=blockindent>&nbsp; &#9679; &nbsp; I am also using an intrusive list here, so we have to include the list pointers again</div>
 
