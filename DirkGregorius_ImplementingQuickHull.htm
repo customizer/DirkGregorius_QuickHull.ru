@@ -9,7 +9,7 @@
 <a href="https://www.gamedev.net/profile/30524-dirk-gregorius/?tab=activity"><img src="img/Dirk_Gregorius.png" width=150 border=0 align="left" alt="Dirk Gregorius" style="margin-top:-20px;"></a>
 <div style="color:#000080; margin-left:220px;"><a href="https://www.gamedev.net/profile/30524-dirk-gregorius/?tab=activity">Dirk Gregorius</a></div>
 
-<h1 style="margin-top:20px; margin-left:200px; margin-bottom:40px;">Реализация быстрого алгоритма выпуклой оболочки<br>
+<h1 style="margin-top:20px; margin-left:200px; margin-bottom:40px;">Реализация <wbr>быстрого алгоритма<br>&nbsp; &nbsp; &nbsp; выпуклой оболочки<br>
 <span style="font-size:70%; margin-left:20px;">Implementing&nbsp;QuickHull</span></h1><br><br>
 Добрый день! Меня зовут Дирк, и я инженер-программист в Valve.<br><br>
 Некоторые из вас возможно заметили, что я изменил заголовок своей лекции на: "Реализация алгоритма выпуклой оболочки".<br>
@@ -620,13 +620,9 @@ In the worst case this can introduce concave faces which are now NOT merged prop
 
 <!-- Page 105 -->
 Еще одна идея для решения этой проблемы - при объединении граней вообще <b>НЕ</b> перестраивать плоскости граней:
-Another idea to deal with this problem is to NOT rebuild the face planes at all when merging to faces:
 <div class="caption"><img src="img/94.png" width=600><br>face plane - плоскость грани</div>
 <div class=blockindent>&nbsp; &#9679; &nbsp; Для обеих граней у вас есть наиболее подходящая плоскость и вершины (которые я и попытался изобразить на рисунке).</div>
-
-<div class=blockindent>&nbsp; &#9679; &nbsp; Теперь можно вычислить абсолютное расстояние вершин правой грани до плоскости левой грани и наоборот.
-We can now compute the absolute distance of the right face’s vertices to the left face’s plane and vice versa</div>
-
+<div class=blockindent>&nbsp; &#9679; &nbsp; Теперь можно вычислить абсолютное расстояние от вершин правой грани до плоскости левой грани и наоборот.</div>
 <div class=blockindent>&nbsp; &#9679; &nbsp; Затем просто сохраняем плоскость грани, которая минимизирует расстояние, вместо её перестраивания.
 Then we simply keep the face plane that minimizes the distance instead of rebuilding it</div>
 
@@ -647,47 +643,30 @@ These are the weak spots where might have introduced new errors</div>
 An easy strategy is to iterate all new faces and repair each edge one by one</div><br><br>
 
 <!-- Page 107 -->
-Это закрывает теорию, и в оставшейся части этого разговора я хотел бы поделиться некоторыми быстрыми советами о возможной реализации
-This closes the theory and in the remainder of this talk I like to share some quick tips about a possible implementation<br><br>
-
-<!-- Page 108 -->
+<h1 class=head1>Реализация</h1>
+На этом завершаем теорию и в оставшейся части этого разговора хотелось поделиться некоторыми краткими советами о возможной реализации.<br><br>
 Основной ловушкой для производительности является плохое управление памятью полуреберной структуры данных:
-The major performance pitfall is bad memory management of the half-edge data structure:
-
-<div class=blockindent>&nbsp; &#9679; &nbsp; Выпуклая оболочка для <b>N</b> вершин ограничена
-The convex hull for N vertices is bounded</div>
-
-<div class=blockindent>&nbsp; &#9679; &nbsp; Наихудшим случаем является тот, у которого все входные вершины находятся на оболочке: Worst case is that all input vertices are on the hull:</div>
-
-<div class=blockindent>&nbsp; &#9679; &nbsp; Число вершин тогда не более V = N. The number of vertices is then at most V = N</div>
-
-<div class=blockindent>&nbsp; &#9679; &nbsp; Число ребер тогда не более E = 3N - 6. The number of edges is then at most E = 3N – 6</div>
-
-<div class=blockindent>&nbsp; &#9679; &nbsp; Число граней тогда не более F = 2N - 4. The number of faces is then at most F = 2N – 4</div>
-
-<div class=blockindent>&nbsp; &#9679; &nbsp; Проверка по формуле Эйлера: V - E + F = 2. Test with Euler’s formula: V –  E + F = 2</div><br><br>
-
+<div class=blockindent>&nbsp; &#9679; &nbsp; Выпуклая оболочка ограничена <b>N</b> вершинами.</div>
+<div class=blockindent>&nbsp; &#9679; &nbsp; Наихудшим случаем является тот, при котором все входные вершины находятся на оболочке:</div>
+<div class=blockindent>&nbsp; &#9679; &nbsp; При этом максимальное число вершин не более <b>V = N</b>.</div>
+<div class=blockindent>&nbsp; &#9679; &nbsp; При этом максимальное число ребер не более <b>E = 3N - 6</b>.</div>
+<div class=blockindent>&nbsp; &#9679; &nbsp; При этом максимальное число граней не более <b>F = 2N - 4</b>.</div>
+<div class=blockindent>&nbsp; &#9679; &nbsp; Проверка проводится по <a href="https://ru.wikipedia.org/wiki/%D0%AD%D0%B9%D0%BB%D0%B5%D1%80,_%D0%9B%D0%B5%D0%BE%D0%BD%D0%B0%D1%80%D0%B4#.D0.93.D0.B5.D0.BE.D0.BC.D0.B5.D1.82.D1.80.D0.B8.D1.8F" target="_blank">формуле Эйлера</a> для выпуклых многогранников: <b>V - E + F = 2</b>.<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; N - (3N - 6) + (2N - 4) = N - 3N + 6 + 2N - 4 = 2 (как видите, все сходится)</div><br><br>
 
 В нашей реализации можно предварительно выделить один буфер для вершин, полуребер и граней и управлять этим буфером в свободном списке.
-In our implementation we can pre-allocate one buffer for vertices, half-edges, and faces and manage this buffer in a free list
-
-<div class=blockindent>&nbsp; &#9679; &nbsp; В идеале у нас будет только одно большое назначение на конструкцию оболочки! Ideally we will just have one big allocation per hull construction!</div>
-
-<div class=blockindent>&nbsp; &#9679; &nbsp; Это становится особенно важным, если планируется вычислять выпуклые оболочки во время выполнения (например, для разрушения).
-This becomes especially important if you plan to compute convex hulls at runtime (e.g. for destruction)</div><br><br>
+<div class=blockindent>&nbsp; &#9679; &nbsp; В идеале у нас будет только одно большое назначение на конструкцию оболочки!</div>
+<div class=blockindent>&nbsp; &#9679; &nbsp; Это становится особенно важным, если планируется вычислять выпуклые оболочки во время выполнения (например, для разрушения).</div><br><br>
 
 Вот некоторые практические детали:
-Here are some practical details:
-<div class=blockindent>&nbsp; &#9679; &nbsp; Не забывайте, что нужно назначать полуребра (которых вдвое больше, чем ребер).
-Don’t forget that you need to allocate half-edges (which is twice the number of edges)</div>
-
-<div class=blockindent>&nbsp; &#9679; &nbsp; Также необходимо учитывать временные назначения (например, грани горизонта).
-We also need to account for temporary allocations (e.g. horizon faces)</div>
-
-<div class=blockindent>&nbsp; &#9679; &nbsp; На практике я просто удваиваю размер буфера. In practice I just double the buffer size</div>
+<div class=blockindent>&nbsp; &#9679; &nbsp; Не забывайте, что нужно назначать полуребра (которых вдвое больше, чем ребер).</div>
+<div class=blockindent>&nbsp; &#9679; &nbsp; Также необходимо учитывать временные назначения (например, грани горизонта).</div>
+<div class=blockindent>&nbsp; &#9679; &nbsp; На практике я просто удваиваю размер буфера.</div><br><br>
 
 <!-- Page 109 -->
 <h3>Реализация: полуреберная сетка</h3>
+Давайте начнем со структуры вершин.
+<div class=blockindent>&nbsp; &#9679; &nbsp; Для хранения вершин я пользуюсь <a href="https://ru.wikipedia.org/wiki/%D0%98%D0%BD%D1%82%D1%80%D1%83%D0%B7%D0%B8%D0%B2%D0%BD%D1%8B%D0%B9_%D1%81%D0%BF%D0%B8%D1%81%D0%BE%D0%BA" target="_blank" onmouseover="show('Интрузивный список — это такой список, в котором каждый элемент<br>содержит ссылки на соседей. Другими словами, элементы в таком<br>списке «имеют представление» о том, что находятся в списке и своем<br>положении в нем, тогда как в обычном списке данные и информация<br>о соседних элементах изолированы друг от друга.')" onmouseout="hide()">интрузивным списком</a>.</div>
 <pre>struct qhVertex
 {
   qhVertex * Prev;
@@ -696,21 +675,17 @@ We also need to account for temporary allocations (e.g. horizon faces)</div>
   qhHalfEdge* Edge;<br>
   qhVector3 Position;
 };</pre>
-Давайте начнем со структуры вершин.
-<div class=blockindent>&nbsp; &#9679; &nbsp; Для хранения вершин я пользуюсь <a href="https://ru.wikipedia.org/wiki/%D0%98%D0%BD%D1%82%D1%80%D1%83%D0%B7%D0%B8%D0%B2%D0%BD%D1%8B%D0%B9_%D1%81%D0%BF%D0%B8%D1%81%D0%BE%D0%BA" target="_blank" onmouseover="show('Интрузивный список — это такой список, в котором каждый элемент<br>содержит ссылки на соседей. Другими словами, элементы в таком<br>списке «имеют представление» о том, что находятся в списке и своем<br>положении в нем, тогда как в обычном списке данные и информация<br>о соседних элементах изолированы друг от друга.')" onmouseout="hide()">интрузивным списком</a>.</div>
 <div class=blockindent>&nbsp; &#9679; &nbsp; Вершины находятся либо на оболочке, либо в списке конфликтов.</div>
-
-<div class=blockindent>&nbsp; &#9679; &nbsp; Поэтому, естественно, мы должны включить сюда указатели списка. So obviously we have to include the list pointers here.</div>
-
+<div class=blockindent>&nbsp; &#9679; &nbsp; Поэтому, естественно, мы должны включить сюда указатели списка.</div>
 <div class=blockindent>&nbsp; &#9679; &nbsp; При желании можно также сохранить ребро, оставляющее вершину.
 We can optionally also store an edge leaving the vertex.</div>
 
-<div class=blockindent>&nbsp; &#9679; &nbsp; Это не требуется для построения оболочки, но может быть полезно для последующей обработки, если вам понадобится, например, для итерации всех смежных граней вершины.
-This is not needed for constructing the hull, but it can be useful for post-processing if you like e.g. to iterate all adjacent faces of the vertex</div>
-
-<div class=blockindent>&nbsp; &#9679; &nbsp; Конечно, также нужно сохранять положение вершины.</div>
+<div class=blockindent>&nbsp; &#9679; &nbsp; Это не требуется для построения оболочки, но может быть полезно для последующей обработки, если вам понадобится, например, для перебора (итерации) всех смежных граней вершины.</div>
+<div class=blockindent>&nbsp; &#9679; &nbsp; Конечно, также нужно сохранять положение вершины.</div><br>
 
 <!-- Page 110 -->
+Теперь давайте глянем, как можно реализовать полуребро:
+<div class=blockindent>&nbsp; &#9679; &nbsp; Как и следовало ожидать, это определение непосредственно сопоставляется с возможной структурой данных.</div>
 <pre>struct qhHalfEdge
 {
   qhVertex* Tail;<br>
@@ -719,22 +694,13 @@ This is not needed for constructing the hull, but it can be useful for post-proc
   qhHalfEdge* Twin;<br>
   qhFace* Face;
 };</pre>
-Теперь давайте глянем, как можно реализовать полуребро:
-Now let’s have a quick look how we can potentially implement a half-edge:
-
-<div class=blockindent>&nbsp; &#9679; &nbsp; Как и следовало ожидать, это определение непосредственно сопоставляется с возможной структурой данных.
-As we would expect this definition maps pretty directly to a possible data structure</div>
-
 <div class=blockindent>&nbsp; &#9679; &nbsp; Мы сохраняем указатель на хвостовую вершину ребра.</div>
-
-<div class=blockindent>&nbsp; &#9679; &nbsp; Полуребра создают круговой список вокруг грани, поэтому здесь также нужно сохранить указатели списка.
-The half-edges build a circular list around the face so we also need to store the list pointers here</div>
-
+<div class=blockindent>&nbsp; &#9679; &nbsp; Полуребра, окружающие грань, создают круговой список, поэтому нужно здесь же сохранять указатели списка.</div>
 <div class=blockindent>&nbsp; &#9679; &nbsp; И, конечно же, также сохраняем ребро-двойник, для перехода к соседней грани.</div>
-<div class=blockindent>&nbsp; &#9679; &nbsp; Наконец, также сохраняем ссылку на родительскую грань ребра.</div>
-
+<div class=blockindent>&nbsp; &#9679; &nbsp; Наконец, также сохраняем ссылку на родительскую грань ребра.</div><br>
 
 <!-- Page 111 -->
+Наконец, структура грани:
 <pre>struct qhFace
 {
   qhFace* Prev;
@@ -742,14 +708,9 @@ The half-edges build a circular list around the face so we also need to store th
   qhHalfEdge* Edge;
   qhList&lt; qhVertex > ConflictList;
 };</pre>
-Наконец, структура граней:
-
-<div class=blockindent>&nbsp; &#9679; &nbsp; I am also using an intrusive list here, so we have to include the list pointers again</div>
-
-<div class=blockindent>&nbsp; &#9679; &nbsp; And of course there is a pointer to the first edge starting the circular list around the face</div>
-
-<div class=blockindent>&nbsp; &#9679; &nbsp; Finally it is possibly a good idea to store our conflict list here as well</div>
-
+<div class=blockindent>&nbsp; &#9679; &nbsp; Здесь также используется <a href="https://ru.wikipedia.org/wiki/%D0%98%D0%BD%D1%82%D1%80%D1%83%D0%B7%D0%B8%D0%B2%D0%BD%D1%8B%D0%B9_%D1%81%D0%BF%D0%B8%D1%81%D0%BE%D0%BA" target="_blank" onmouseover="show('Интрузивный список — это такой список, в котором каждый элемент<br>содержит ссылки на соседей. Другими словами, элементы в таком<br>списке «имеют представление» о том, что находятся в списке и своем<br>положении в нем, тогда как в обычном списке данные и информация<br>о соседних элементах изолированы друг от друга.')" onmouseout="hide()">интрузивный список</a> и поэтому опять в него включены указатели списка.</div>
+<div class=blockindent>&nbsp; &#9679; &nbsp; И конечно, есть указатель на первое ребро, начинающее круговой список ребер, окружающих грань.</div>
+<div class=blockindent>&nbsp; &#9679; &nbsp; Наконец, неплохо также сохранять здесь наш список конфликтов.</div><br><br>
 
 <!-- Page 112 -->
 <h3>Реализация: построение (construction)</h3>
@@ -764,16 +725,18 @@ The half-edges build a circular list around the face so we also need to store th
     Vertex = NextConflictVertex();
   }
 };</pre>
+Наконец, некоторые примеры кода высокого уровня, чтобы дать представление о возможной реализации:
 Finally some high-level code examples to give you an idea of a possible implementation:
 
-<div class=blockindent>&nbsp; &#9679; &nbsp; Assume we have some qhConvex class to store the hull after construction</div>
+<div class=blockindent>&nbsp; &#9679; &nbsp; Предположим, что у нас есть класс <tt>qhConvex</tt> для сохранения оболочки после построения.
+Assume we have some qhConvex class to store the hull after construction</div>
 
 <div class=blockindent>&nbsp; &#9679; &nbsp; This snippet shows the top level construction function</div>
 
 Explain a bit…
 
 <!-- Page 113 -->
-<h3>Реализация: повторение (iteration)</h3>
+<h3>Реализация: перебор (iteration)</h3>
 <pre>void qhConvex::AddVertex( const qhVertex* Vertex )
 {
   qhArray&lt; qhHalfEdge* > Horizon;
@@ -783,22 +746,19 @@ Explain a bit…
   MergeFaces( NewFaces );<br>
   ResolveOrphans( NewFaces );
 };</pre>
-The code snippets shows the iterative AddVertex() function
+Фрагменты кода показывают функцию перебора <tt>AddVertex()</tt>.
+<div class=blockindent>&nbsp; &#9679; &nbsp; Добавляем новые точки до тех пор, пока не опустеют наши списки конфликтов.</div>
 
-<div class=blockindent>&nbsp; &#9679; &nbsp; We add new points until our conflict lists are empty</div>
-
-Explain a bit…
+Explain a bit...<br><br>
 
 <!-- Page 114 -->
-So you want to implement Qhull yourself and I talked now for nearly an hour and there is no code!
-
-<div class=blockindent>&nbsp; &#9679; &nbsp; Luckily there is a beautiful open-source implementation in JAVA which you can use to start</div>
-
-<div class=blockindent>&nbsp; &#9679; &nbsp; I also recommend looking at the original Qhull implementation which is not only a great implementation, but also full of gems of computational geometry!!!</div>
-
-This closes the talk and hopefully my presentation will help you to understand and implement a robust convex hull builder!
-
-Thank you!<br><br>
+Итак, я проговорил почти час и вам самим уже хочется реализовать Quickhull, а кода все нет!
+<div class=blockindent>&nbsp; &#9679; &nbsp; К счастью, имеется красивая реализация с открытым исходным кодом на Java, которую можно использовать для начала.</div>
+<div class=blockindent>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <a href="http://www.cs.ubc.ca/~lloyd/java/quickhull3d.html" target="_blank">Quickhull3D (Java)</a></div>
+<div class=blockindent>&nbsp; &#9679; &nbsp; Также рекомендуется взглянуть на исходную реализацию Qhull, которая является не просто отличной, но и полна жемчужин вычислительной геометрии!!!</div>
+<div class=blockindent>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <a href="http://www.qhull.org" target="_blank">QHull (C/C++)</a></div>
+На этом лекция заканчивается и надеюсь, она поможет понять и реализовать надежный конструктор выпуклой оболочки!<br>
+Спасибо!<br><br>
 
 <h1 class=head1 id="ref">Литература</h1>
 Описание алгоритма Quickhull:
@@ -808,15 +768,15 @@ J. Smith: "Quickhull 3D"</div>
 Книги:
 <div class=blockindent><a href="https://www.amazon.com/Collision-Detection-Interactive-Environments-Technology/dp/155860801X" target="_blank">G. v. d. Bergen: "Collision Detection in Interactive 3D Environments"</a><br>
 <a href="http://realtimecollisiondetection.net/books/rtcd/" target="_blank">C. Ericson: "Real-time Collision Detection"</a><br>
-J. O'Rourke: "Computational Geometry in C"<br>
-M. de Berg: "Computational Geometry"<br>
-E. Langetepe: "Geometric Data Structures for Computer Graphics"</div>
+<a href="http://crtl-i.com/PDF/comp_c.pdf" target="_blank">J. O'Rourke: "Computational Geometry in C"</a><br>
+<a href="http://people.inf.elte.hu/fekete/algoritmusok_msc/terinfo_geom/konyvek/Computational%20Geometry%20-%20Algorithms%20and%20Applications,%203rd%20Ed.pdf" target="_blank">M. de Berg: "Computational Geometry"</a><br>
+<a href="https://pdfs.semanticscholar.org/e9c1/31355c0add8de24c646021f7bc56a36223c0.pdf" target="_blank">E. Langetepe: "Geometric Data Structures for Computer Graphics"</a></div>
 Публикации на смежные темы:
-<div class=blockindent>G. Rhodes: "Computational Geometry" (Half-Edge Mesh)<br>
-M. McGuire: "The Half-Edge Data Structure" (Half-Edge Mesh)<br>
-D. Gordon: "Computing the Plane Equation of a Polygon" (Newell Plane)<br>
-E. Catto: "A Troublesome Triangle" (Newell Plane)<br>
-S. Melax: "Interaction with 3D Geometry" (StanHull)</div>
+<div class=blockindent>G. Rhodes: "Computational Geometry" (полуреберная сетка)<br>
+<a href="http://www.flipcode.com/archives/The_Half-Edge_Data_Structure.shtml" target="_blank">M. McGuire: "The Half-Edge Data Structure"</a> (полуреберная сетка)<br>
+<a href="http://cs.haifa.ac.il/~gordon/plane.pdf" target="_blank">D. Gordon: "Computing the Plane Equation of a Polygon"</a> (плоскость Ньюела)<br>
+<a href="https://box2d.org/2014/01/troublesome-triangle/" target="_blank">E. Catto: "A Troublesome Triangle"</a> (плоскость Ньюела)<br>
+<a href="http://twvideo01.ubm-us.net/o1/vault/gdc2013/slides/822512Melax_Stan_InteractionWithGeometry.pdf" target="_blank">S. Melax: "Interaction with 3D Geometry"</a>(StanHull)</div>
 Статьи о вычислениях с плавающей запятой:
 <div class=blockindent><a href="http://randomascii.wordpress.com/categorv/floating-point/" target="_blank">B. Dawson: http://randomascii.wordpress.com/categorv/floating-point/</a><br>
 <a href="http://realtimecollisiondetection.net/pubs/Tolerances/" target="_blank">C. Ericson: http://realtimecollisiondetection.net/pubs/Tolerances/</a></div>
